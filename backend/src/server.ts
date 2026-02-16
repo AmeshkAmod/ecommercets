@@ -4,7 +4,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import connectDB from "./config/db.js";
+import connectDB from "./config/db";
 import { seedRoles } from "./config/authRoles.js";
 
 import authRoutes from "./routes/authRoutes.js";

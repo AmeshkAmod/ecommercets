@@ -1,29 +1,39 @@
-import User from "../models/User.js";
+import  type{Request,Response} from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import User from "../models/User"
 
-export const register = async (req, res) => {
-  const { name, email, password, roles } = req.body;
-  try {
-    const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ message: "User exists" });
-    const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({
-      name,
-      email,
-      password: hashed,
-      roles: roles && roles.length ? roles : ["user"],
-    });
+interface RegisterBody{
+  name :string;
+  email: string;
+  password : string;
+  roles?: string[];
+}
 
-    const token = jwt.sign(
-      {
-        id: user._id,
-        roles: user.roles,
-        isAdmin: user.roles.includes("admin"),
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-    );
+   const secret = process.env.JWT_SECRET;
+
+if (!secret) {
+  throw new Error("JWT_SECRET is not defined");
+}
+
+const token = jwt.sign(
+  {
+    id: User._id.toString(),
+    roles: User.roles,
+    isAdmin: User.roles.includes("admin"),
+  },
+  secret,
+  { expiresIn: "7d" }
+);
+
+  {
+    id: User._id.toString(),
+    roles: User.roles,
+    isAdmin: User.roles.includes("admin"),
+  },
+  process.env.JWT_SECRET as string,
+  { expiresIn: "7d" }
+);
     res.status(201).json({
       token,
       user: {
