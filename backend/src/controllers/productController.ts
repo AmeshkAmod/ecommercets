@@ -1,4 +1,4 @@
-import Product from "../models/product.js";
+import Product from "../models/Product.js";
 
 export const listProducts = async (req, res) => {
   const q = req.query.q || "";
@@ -50,7 +50,7 @@ export const addProductReview = async (req, res) => {
 
     // prevent multiple reviews from same user
     const alreadyReviewed = product.reviews.find(
-      (r) => r.user.toString() === req.user._id.toString()
+      (r) => r.user.toString() === req.user._id.toString(),
     );
 
     if (alreadyReviewed) {
