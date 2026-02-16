@@ -1,58 +1,92 @@
+import type { Request, Response } from "express";
+import type { Types } from "mongoose";
 import Product from "../models/Product.js";
 
-export const listProducts = async (req, res) => {
-  const q = req.query.q || "";
+interface ProductQuery {
+  q?: string;
+}
+
+interface ReviewBody {
+  rating: number;
+  comment: string;
+}
+
+interface ProductReview {
+  user: Types.ObjectId;
+  rating: number;
+}
+
+export const listProducts = async (
+  req: Request,
+  res: Response,
+) => {
+  const query = req.query as ProductQuery;
+  const q = typeof query.q === "string" ? query.q : "";
   const products = await Product.find({
     title: { $regex: q, $options: "i" },
   }).limit(50);
-  res.json(products);
+  return res.json(products);
 };
 
-export const getProduct = async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  if (!product) return res.status(404).json({ message: "Not found" });
-  res.json(product);
+export const getProduct = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const product = await Product.findById(id);
+  if (!product) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  return res.json(product);
 };
 
-export const createProduct = async (req, res) => {
-  const p = await Product.create(req.body);
-  res.json(p);
+export const createProduct = async (
+  req: Request,
+  res: Response,
+) => {
+  const product = await Product.create(req.body as Record<string, unknown>);
+  return res.json(product);
 };
 
-export const updateProduct = async (req, res) => {
-  const p = await Product.findByIdAndUpdate(req.params.id, req.body, {
+export const updateProduct = async (
+  req: Request,
+  res: Response,
+) => {
+  const { id } = req.params;
+  const product = await Product.findByIdAndUpdate(id, req.body as Record<string, unknown>, {
     new: true,
   });
-  res.json(p);
+  return res.json(product);
 };
 
-export const deleteProduct = async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+export const deleteProduct = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  await Product.findByIdAndDelete(id);
+  return res.json({ message: "Deleted" });
 };
 
-export const addProductReview = async (req, res) => {
+export const addProductReview = async (
+  req: Request,
+  res: Response,
+) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     const productId = req.params.id;
-    const { rating, comment } = req.body;
+    const { rating, comment } = req.body as ReviewBody;
 
     if (!rating || !comment) {
-      return res
-        .status(400)
-        .json({ message: "Rating and comment are required" });
+      return res.status(400).json({ message: "Rating and comment are required" });
     }
 
     const product = await Product.findById(productId);
-
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // prevent multiple reviews from same user
-    const alreadyReviewed = product.reviews.find(
-      (r) => r.user.toString() === req.user._id.toString(),
+    const reviews = product.reviews as unknown as ProductReview[];
+    const alreadyReviewed = reviews.find(
+      (review: ProductReview) => review.user.toString() === req.user?._id.toString(),
     );
-
     if (alreadyReviewed) {
       return res.status(400).json({ message: "Product already reviewed" });
     }
@@ -67,19 +101,14 @@ export const addProductReview = async (req, res) => {
 
     product.reviews.push(review);
     product.numReviews = product.reviews.length;
-
     product.rating =
-      product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+      reviews.reduce((sum: number, item: ProductReview) => sum + item.rating, 0) /
       product.numReviews;
 
     await product.save();
-
-    res.status(201).json({
-      message: "Review added",
-      product,
-    });
-  } catch (err) {
+    return res.status(201).json({ message: "Review added", product });
+  } catch (err: unknown) {
     console.error("Add review error:", err);
-    res.status(500).json({ message: "Failed to add review" });
+    return res.status(500).json({ message: "Failed to add review" });
   }
 };

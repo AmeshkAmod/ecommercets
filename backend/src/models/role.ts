@@ -1,4 +1,4 @@
- import mongoose from "mongoose";
+import mongoose from "mongoose";
 const RoleSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
 
@@ -9,6 +9,8 @@ const RoleSchema = new mongoose.Schema({
   overrides: [{ type: String }],  // only if roles have overrides (optional)
 });
 
-const Role=mongoose.models.Role || mongoose.model("Role",RoleSchema)
+const Role: mongoose.Model<any> =
+  (mongoose.models.Role as mongoose.Model<any>) ||
+  mongoose.model("Role", RoleSchema);
 
 export default Role;

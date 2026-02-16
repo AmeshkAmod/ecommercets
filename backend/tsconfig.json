@@ -8,8 +8,10 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
+    "moduleResolution": "nodenext",
     "target": "esnext",
-    "types": [],
+    "types": ["node"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -41,5 +43,5 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }

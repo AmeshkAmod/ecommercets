@@ -1,55 +1,63 @@
+import type { NextFunction, Request, Response } from "express";
 import Role from "../models/role.js";
 
-export async function getEffectivePermissions(user) {
-  // Fetch all roles the user has
-  const roleDocs = await Role.find({ name: { $in: user.roles } });
+interface RoleDoc {
+  name: string;
+  permissions?: string[];
+  inherits?: string[];
+}
 
-  const visited = new Set();
-  const stack = [...roleDocs];
+export async function getEffectivePermissions(
+  user: Express.AuthenticatedUser,
+): Promise<Set<string>> {
+  const roleDocs = (await Role.find({ name: { $in: user.roles } }).lean()) as unknown as RoleDoc[];
 
-  // Convert user overrides to Set
-  const perms = new Set(user.overrides || []);
+  const visited = new Set<string>();
+  const stack: RoleDoc[] = [...roleDocs];
+  const perms = new Set<string>(user.overrides ?? []);
 
   while (stack.length) {
     const role = stack.pop();
-    if (!role) continue; // ❗ important safety check
+    if (!role) {
+      continue;
+    }
 
-    if (visited.has(role.name)) continue;
+    if (visited.has(role.name)) {
+      continue;
+    }
     visited.add(role.name);
 
-    // Add role's permissions
-    (role.permissions || []).forEach((p) => perms.add(p));
+    (role.permissions ?? []).forEach((permission: string) => {
+      perms.add(permission);
+    });
 
-    // Process inherited roles
-    (role.inherits || []).forEach((rn) => {
-      const inherited = roleDocs.find((r) => r.name === rn);
-      if (inherited) stack.push(inherited); // ❗ only push if exists
+    (role.inherits ?? []).forEach((roleName: string) => {
+      const inherited = roleDocs.find((candidate: RoleDoc) => candidate.name === roleName);
+      if (inherited) {
+        stack.push(inherited);
+      }
     });
   }
 
   return perms;
 }
 
-export function requirePermissions(...needed) {
-  return async (req, res, next) => {
+export function requirePermissions(...needed: string[]) {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = req.user; // set by your auth middleware
-
-      if (!user)
+      const user = req.user;
+      if (!user) {
         return res.status(401).json({ error: "unauthenticated" });
+      }
 
       const perms = await getEffectivePermissions(user);
-
-      const ok = needed.every((p) => perms.has(p));
-      if (!ok) {
-        return res.status(403).json({
-          error: "forbidden",
-          missing: needed.filter((p) => !perms.has(p)),
-        });
+      const missing = needed.filter((permission: string) => !perms.has(permission));
+      if (missing.length > 0) {
+        return res.status(403).json({ error: "forbidden", missing });
       }
 
       next();
-    } catch (err) {
+    } catch (err: unknown) {
       next(err);
     }
   };

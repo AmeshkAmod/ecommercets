@@ -16,5 +16,7 @@ status: { type: String, default: 'Pending' }
 }, { timestamps: true });
 
 
-const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
+const Order: mongoose.Model<any> =
+  (mongoose.models.Order as mongoose.Model<any>) ||
+  mongoose.model("Order", orderSchema);
 export default Order;
