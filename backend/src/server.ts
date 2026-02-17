@@ -1,4 +1,4 @@
-import express from "express";
+import express,{Application} from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
@@ -14,7 +14,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 
 dotenv.config();
 
-const app = express();
+const app:Application = express();
 
 /* ---------- DB ---------- */
 connectDB();
