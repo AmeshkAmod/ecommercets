@@ -1,22 +1,10 @@
-import { Model, Document, Schema } from "mongoose";
+import { Schema} from "mongoose";
+import type { InferSchemaType, HydratedDocument } from "mongoose";
 import mongoose from "mongoose";
 
-//Defined the shape
-interface cartItem {
-  productId: mongoose.Types.ObjectId;
-  quantity: number;
-}
-
-//Defined the full cart doc
-export interface cartDocument extends Document {
-  userId: mongoose.Types.ObjectId;
-  items: cartItem[];
-  createdAt?: Date;
-  updatedAt?: Date;
-}
 
 //Schema
-const cartSchema = new Schema<cartDocument>({
+const cartSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: "User",
@@ -38,7 +26,14 @@ const cartSchema = new Schema<cartDocument>({
   ],
 }, { timestamps: true });
 
-//MOdel with type safety
-const Cart: Model<cartDocument> =
-  mongoose.models.Cart || mongoose.model<cartDocument>("Cart", cartSchema);
-export default Cart;
+// to automatically infer types
+export type Cart = InferSchemaType<typeof cartSchema>
+
+// mongoosse model
+export type CartDocument = HydratedDocument<Cart>;
+
+
+const CartModel =
+  mongoose.models.Cart || mongoose.model("Cart", cartSchema);
+
+export default CartModel;
