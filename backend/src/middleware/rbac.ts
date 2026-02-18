@@ -1,3 +1,4 @@
+import type { Request, Response, NextFunction } from "express";
 import Role from "../models/role.js";
 
 export async function getEffectivePermissions(user) {
@@ -31,7 +32,7 @@ export async function getEffectivePermissions(user) {
 }
 
 export function requirePermissions(...needed) {
-  return async (req, res, next) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.user; // set by your auth middleware
 
