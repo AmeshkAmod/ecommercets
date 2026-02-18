@@ -13,11 +13,17 @@ const roleSchema = new Schema(
 
     permissions: [
       { 
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: "Permission",
         required: true,
       },
     ],
+
+    inherits: [
+      {
+        type: String,
+      }
+    ]
   },
   { timestamps: true }
 );
