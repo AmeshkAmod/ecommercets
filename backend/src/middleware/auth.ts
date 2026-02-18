@@ -1,25 +1,38 @@
+import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import type { JwtPayload } from "../types/authTypes.js";
 
-export const protect = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) {
-    return res.status(401).json({ message: "Not authorized, no token" });
+export const protect = async (req:Request, res:Response, next:NextFunction) => {
+
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Not authorized" });
   }
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decoded.id).select("-password");
-    if (!user) {
-      return res
-        .status(401)
-        .json({ message: "Not authorised, user not found" });
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Token missing" });
+  }
+  
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    );
+
+    //making sure decoded is an object
+    if (typeof decoded !=="object" || decoded === null) {
+      return res.status(401).json({ message: "Invalid token structure" });
     }
 
-    req.user = user;
+    // cast safety
+    req.user = decoded as JwtPayload;
+
     next();
-  } catch (err) {
-    res.status(401).json({ message: "Token invalid" });
+  } catch {
+    return res.status(401).json({ message: "Token invalid or expired" });
   }
 };
 

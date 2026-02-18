@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import Role from "../models/role.js";
+import RoleModel from "../models/role.js";
 
 export async function getEffectivePermissions(user) {
   // Fetch all roles the user has
