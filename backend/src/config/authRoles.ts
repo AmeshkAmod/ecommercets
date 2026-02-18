@@ -2,7 +2,15 @@
 
 import Role from "../models/role.js";
 
-export const roles = [
+
+interface seedRoles{
+ 
+  name:string,
+  permissions:string[];
+
+}
+
+export const roles:seedRoles[] = [
   {
     name: "admin",
     permissions: [
@@ -25,7 +33,7 @@ export const roles = [
   }
 ];
 
-export async function seedRoles() {
+export async function seedRoles():Promise<void> {
     for (const role of roles) {
     await Role.updateOne(
         { name: role.name },
