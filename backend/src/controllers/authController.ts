@@ -1,76 +1,41 @@
-import User from "../models/User.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import type { Request, Response } from "express";
+import { registerUser, loginUser } from "../services/authService.js";
+import type { RegisterDTO, LoginDTO } from "../types/authTypes.js";
 
-export const register = async (req, res) => {
-  const { name, email, password, roles } = req.body;
+export const register = async (req:Request, res:Response) => {
   try {
-    const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ message: "User exists" });
-    const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({
-      name,
-      email,
-      password: hashed,
-      roles: roles && roles.length ? roles : ["user"],
-    });
+    const data = req.body as RegisterDTO;
 
-    const token = jwt.sign(
-      {
-        id: user._id,
-        roles: user.roles,
-        isAdmin: user.roles.includes("admin"),
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-    );
+    const user = await registerUser(data);
+
     res.status(201).json({
-      token,
+      message: "User registered successfully",
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
-        roles: user.roles,
-        isAdmin: user.roles.includes("admin"),
       },
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
 };
 
-export const login = async (req, res) => {
-  const { email, password } = req.body;
+export const login = async (req:Request, res:Response) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    const data = req.body as LoginDTO;
 
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(400).json({ message: "Invalid credentials" });
-
-    const token = jwt.sign(
-      {
-        id: user._id,
-        roles: user.roles,
-        isAdmin: user.roles.includes("admin"),
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
-    );
-
+    const { user, token } = await loginUser(data);
+    
     res.json({
       token,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
-        roles: user.roles,
-        isAdmin: user.roles.includes("admin"),
       },
     });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
   }
 };
