@@ -45,6 +45,6 @@ export type UserDocument = HydratedDocument<User>;
 
 //Prevent model overwrite
 const UserModel = 
-  mongoose.models.User || mongoose.model("User", userSchema);
+  mongoose.models.User as mongoose.Model<User> || mongoose.model<User>("User", userSchema);
 
 export default UserModel;

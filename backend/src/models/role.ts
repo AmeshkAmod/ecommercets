@@ -1,4 +1,4 @@
- import mongoose, { Schema } from "mongoose";
+ import mongoose, { Schema, type Model } from "mongoose";
  import type { InferSchemaType,HydratedDocument } from "mongoose";
 
  //schema
@@ -38,7 +38,7 @@ export type Role = InferSchemaType<typeof roleSchema>;
 export type RoloDocument = HydratedDocument<Role>;
 
 //model
-const RoleModel = 
-mongoose.models.Role || mongoose.model("Role",roleSchema)
+const RoleModel: Model<Role> = 
+mongoose.models.Role || mongoose.model<Role>("Role",roleSchema)
 
 export default RoleModel;
