@@ -1,4 +1,4 @@
-import { Schema} from "mongoose";
+import { Schema,type Model} from "mongoose";
 import type { InferSchemaType, HydratedDocument } from "mongoose";
 import mongoose from "mongoose";
 
@@ -33,7 +33,7 @@ export type Cart = InferSchemaType<typeof cartSchema>
 export type CartDocument = HydratedDocument<Cart>;
 
 
-const CartModel =
-  mongoose.models.Cart || mongoose.model("Cart", cartSchema);
+const CartModel:Model<Cart> =
+  mongoose.models.Cart || mongoose.model<Cart>("Cart", cartSchema);
 
 export default CartModel;

@@ -1,12 +1,17 @@
-import type { JwtPayload } from "jsonwebtoken";
-import type { User } from "../models/User.js";
+import { Types } from "mongoose";
 
 declare global {
-    namespace Express {
-        interface Request {
-            user?: JwtPayload;
-        }
+  namespace Express {
+    interface AuthUser {
+      _id: Types.ObjectId;
+      email: string;
+      roles: string[];
     }
+
+    interface Request {
+      user?: AuthUser;
+    }
+  }
 }
 
 export {};

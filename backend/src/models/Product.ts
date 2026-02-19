@@ -1,7 +1,7 @@
 // models/Product.js
-import mongoose, { Schema } from "mongoose";
+import { Schema, type Model } from "mongoose";
 import type { InferSchemaType, HydratedDocument } from "mongoose";
-
+import mongoose from "mongoose";
 //Review 
 const reviewSchema = new Schema(
   {
@@ -92,6 +92,6 @@ export type Product = InferSchemaType<typeof productSchema>;
 //mongoose doc type
 export type ProductDocument = HydratedDocument<Product>
 
-const ProductModel = 
-  mongoose.models.Product || mongoose.model("Product", productSchema);
+const ProductModel:Model<Product> = 
+  mongoose.models.Product || mongoose.model<Product>("Product", productSchema);
 export default ProductModel;
