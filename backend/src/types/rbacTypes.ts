@@ -1,8 +1,7 @@
 export enum PermissionKeys {
-    CREATE_PRODUCT = "CREATE_PRODUCT",
-    UPDATE_PRODUCT = "UPDATE_PRODUCT",
-    DELETE_PRODUCT = "DELETE_PRODUCT",
-    CREATE_ORDER = "CREATE_ORDER",
-    VIEW_USERS = "VIEW_USERS",
-    
+  CREATE_PRODUCT = "product.create",
+  UPDATE_PRODUCT = "product.update",
+  DELETE_PRODUCT = "product.delete",
+  CREATE_ORDER = "order.create",
+  VIEW_USERS = "user.manage",
 }

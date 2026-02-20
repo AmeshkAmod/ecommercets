@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-
+import { buildRolePermissionCache } from "./services/rbacService.js";
 import connectDB from "./config/db.js";
 import { seedRoles } from "./config/authRoles.js";
 
@@ -21,7 +21,9 @@ connectDB();
 
 /* ---------- SEED ROLES ---------- */
 (async () => {
+  await connectDB();
   await seedRoles();
+  await buildRolePermissionCache();
 })();
 
 /* ---------- MIDDLEWARE ---------- */
@@ -31,11 +33,8 @@ app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
-  })
+  }),
 );
-
-
-
 
 app.get("/", (req, res) => {
   res.json({ message: "Backend working" });
