@@ -1,8 +1,9 @@
-// models/Product.js
-import { Schema, type Model } from "mongoose";
-import type { InferSchemaType, HydratedDocument } from "mongoose";
-import mongoose from "mongoose";
-//Review 
+import mongoose, { Schema } from "mongoose";
+import type { InferSchemaType, HydratedDocument, Types } from "mongoose";
+
+/* =========================
+   REVIEW SCHEMA
+========================= */
 const reviewSchema = new Schema(
   {
     user: {
@@ -28,70 +29,68 @@ const reviewSchema = new Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-// infer types from schema
+// Infer Review type
 export type Review = InferSchemaType<typeof reviewSchema>;
 
-
-{/* Product */}
+/* =========================
+   PRODUCT SCHEMA
+========================= */
 const productSchema = new Schema(
   {
-    // your existing fields:
-    title: { 
-      type: String, 
-      required: true 
+    title: {
+      type: String,
+      required: true,
     },
 
-    price: { 
-      type: Number, 
-      required: true 
+    price: {
+      type: Number,
+      required: true,
     },
 
-    description: { 
-      type: String 
-    },
+    description: String,
+    category: String,
+    image: String,
 
-    category: { 
-      type: String 
-    },
-
-    image: { 
-      type: String 
-    },
-
-    countInStock: { 
-      type: Number, 
+    countInStock: {
+      type: Number,
       default: 0,
       min: 0,
     },
 
-    // NEW fields:
-    rating: { 
-      type: Number, 
+    rating: {
+      type: Number,
       default: 0,
       min: 0,
       max: 5,
-    },      // average rating
+    },
 
-    numReviews: { 
-      type: Number, 
+    numReviews: {
+      type: Number,
       default: 0,
-      min:0,
-    },  // total reviews
+      min: 0,
+    },
 
-    reviews: [reviewSchema],          // array of review objects
+    reviews: {
+      type: [reviewSchema],
+      default: [],
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-//infer types from schema
+/* =========================
+   TYPES
+========================= */
 export type Product = InferSchemaType<typeof productSchema>;
+export type ProductDocument = HydratedDocument<Product>;
 
-//mongoose doc type
-export type ProductDocument = HydratedDocument<Product>
-
-const ProductModel:Model<Product> = 
+/* =========================
+   MODEL
+========================= */
+const ProductModel =
   mongoose.models.Product || mongoose.model<Product>("Product", productSchema);
+
 export default ProductModel;

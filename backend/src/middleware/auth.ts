@@ -1,9 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "../types/authTypes.js";
+import { Types } from "mongoose";
 
-export const protect = async (req:Request, res:Response, next:NextFunction) => {
-
+export const protect = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -15,20 +19,22 @@ export const protect = async (req:Request, res:Response, next:NextFunction) => {
   if (!token) {
     return res.status(401).json({ message: "Token missing" });
   }
-  
+
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    );
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
 
     //making sure decoded is an object
-    if (typeof decoded !=="object" || decoded === null) {
+    if (typeof decoded !== "object" || decoded === null) {
       return res.status(401).json({ message: "Invalid token structure" });
     }
 
     // cast safety
-    req.user = decoded as JwtPayload;
+    req.user = {
+      _id: new Types.ObjectId(decoded.userId),
+      email: decoded.email,
+      name: decoded.name,
+      roles: decoded.roles,
+    };
 
     next();
   } catch {

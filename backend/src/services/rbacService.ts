@@ -1,4 +1,5 @@
 import RoleModel from "../models/role.js";
+import { PermissionKeys } from "../types/rbacTypes.js";
 
 type RolePermissionMap = Map<string, Set<string>>;
 
@@ -54,13 +55,13 @@ export async function buildRolePermissionCache() {
 ========================= */
 export function getPermissionsForRoles(
   roles: string[]
-): Set<string> {
-  const perms = new Set<string>();
+): Set<PermissionKeys> {
+  const perms = new Set<PermissionKeys>();
 
   roles.forEach((roleName) => {
     const rolePerms = rolePermissionCache.get(roleName);
     if (rolePerms) {
-      rolePerms.forEach((p) => perms.add(p));
+      rolePerms.forEach((p) => perms.add(p as PermissionKeys));
     }
   });
 

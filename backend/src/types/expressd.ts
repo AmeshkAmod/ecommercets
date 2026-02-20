@@ -5,6 +5,7 @@ declare global {
     interface AuthUser {
       _id: Types.ObjectId;
       email: string;
+      name?: string;
       roles: string[];
     }
 
