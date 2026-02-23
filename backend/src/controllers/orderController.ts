@@ -1,43 +1,50 @@
-import Order from "../models/Order.js";
-import Cart from "../models/Cart.js";
+import { Request, Response } from "express";
+import * as orderService from "../services/orderService.js";
 
-// CREATE ORDER
-export const createOrder = async (req, res) => {
-  const { items, total, paymentMethod } = req.body;
+/* =========================
+   CREATE ORDER
+========================= */
+export const createOrder = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const userId = req.user!._id;
+    const { items, total, paymentMethod } = req.body;
 
-  if (!items || items.length === 0) {
-    return res.status(400).json({ message: "No order items" });
+    const order = await orderService.createOrder({
+      userId,
+      items,
+      total,
+      paymentMethod,
+    });
+
+    res.status(201).json(order);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
   }
-
-  const order = await Order.create({
-    user: req.user._id,
-    items,
-    total,
-    paymentMethod,
-  });
-
-  // ✅ clear cart after order
-  await Cart.findOneAndUpdate(
-    { userId: req.user._id },
-    { $set: { items: [] } }
-  );
-
-  res.status(201).json(order);
 };
 
-// LIST ORDERS (THIS WAS MISSING)
-export const listOrders = async (req, res) => {
+/* =========================
+   LIST ORDERS
+========================= */
+export const listOrders = async (
+  req: Request,
+  res: Response,
+) => {
   try {
-    if (req.user.isAdmin) {
-      const orders = await Order.find().populate("user");
-      return res.json(orders);
-    }
+    const userId = req.user!._id;
+    const isAdmin = req.user!.roles?.includes("ADMIN") ?? false;
 
-    const orders = await Order.find({ user: req.user._id })
-      .populate("items.product");
+    const orders = await orderService.listOrders(
+      userId,
+      isAdmin,
+    );
 
     res.json(orders);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch orders" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch orders",
+    });
   }
 };

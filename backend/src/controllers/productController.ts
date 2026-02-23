@@ -1,85 +1,118 @@
-import Product from "../models/Product.js";
+import { Request, Response } from "express";
+import * as productService from "../services/productService.js";
 
-export const listProducts = async (req, res) => {
-  const q = req.query.q || "";
-  const products = await Product.find({
-    title: { $regex: q, $options: "i" },
-  }).limit(50);
-  res.json(products);
+/* =========================
+   LIST PRODUCTS
+========================= */
+export const listProducts = async (req: Request, res: Response) => {
+  try {
+    const q = (req.query.q as string) || "";
+
+    const products = await productService.listProducts(q);
+
+    res.json(products);
+  } catch (error) {
+    console.error("List products error:", error);
+    res.status(500).json({
+      message: "Failed to fetch products",
+    });
+  }
 };
 
-export const getProduct = async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  if (!product) return res.status(404).json({ message: "Not found" });
-  res.json(product);
+/* =========================
+   GET PRODUCT
+========================= */
+export const getProduct = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
+  try {
+    const product = await productService.getProductById(req.params.id);
+
+    res.json(product);
+  } catch (error: any) {
+    res.status(404).json({ message: error.message });
+  }
 };
 
-export const createProduct = async (req, res) => {
-  const p = await Product.create(req.body);
-  res.json(p);
+/* =========================
+   CREATE PRODUCT
+========================= */
+export const createProduct = async (req: Request, res: Response) => {
+  try {
+    const product = await productService.createProduct(req.body);
+
+    res.status(201).json(product);
+  } catch (error) {
+    console.error("Create product error:", error);
+    res.status(500).json({
+      message: "Failed to create product",
+    });
+  }
 };
 
-export const updateProduct = async (req, res) => {
-  const p = await Product.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
-  res.json(p);
+/* =========================
+   UPDATE PRODUCT
+========================= */
+export const updateProduct = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
+  try {
+    const product = await productService.updateProduct(req.params.id, req.body);
+
+    res.json(product);
+  } catch (error: any) {
+    res.status(404).json({ message: error.message });
+  }
 };
 
-export const deleteProduct = async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+/* =========================
+   DELETE PRODUCT
+========================= */
+export const deleteProduct = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
+  try {
+    await productService.deleteProduct(req.params.id);
+
+    res.json({ message: "Deleted successfully" });
+  } catch (error) {
+    console.error("Delete product error:", error);
+    res.status(500).json({
+      message: "Failed to delete product",
+    });
+  }
 };
 
-export const addProductReview = async (req, res) => {
+/* =========================
+   ADD REVIEW
+========================= */
+export const addProductReview = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   try {
     const productId = req.params.id;
     const { rating, comment } = req.body;
 
-    if (!rating || !comment) {
-      return res
-        .status(400)
-        .json({ message: "Rating and comment are required" });
-    }
+    const userId = req.user!._id;
+    const userName = req.user!.name ?? req.user!.email;
 
-    const product = await Product.findById(productId);
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    // prevent multiple reviews from same user
-    const alreadyReviewed = product.reviews.find(
-      (r) => r.user.toString() === req.user._id.toString(),
-    );
-
-    if (alreadyReviewed) {
-      return res.status(400).json({ message: "Product already reviewed" });
-    }
-
-    const review = {
-      user: req.user._id,
-      name: req.user.name || req.user.email,
-      rating: Number(rating),
+    const product = await productService.addProductReview(
+      productId,
+      userId,
+      userName,
+      Number(rating),
       comment,
-      createdAt: new Date(),
-    };
-
-    product.reviews.push(review);
-    product.numReviews = product.reviews.length;
-
-    product.rating =
-      product.reviews.reduce((sum, r) => sum + r.rating, 0) /
-      product.numReviews;
-
-    await product.save();
+    );
 
     res.status(201).json({
       message: "Review added",
       product,
     });
-  } catch (err) {
-    console.error("Add review error:", err);
-    res.status(500).json({ message: "Failed to add review" });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
   }
 };

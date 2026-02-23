@@ -1,16 +1,50 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import type { InferSchemaType, HydratedDocument } from "mongoose";
 
-const userSchema = new mongoose.Schema(
+
+const userSchema = new Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    roles: [{ type: String, ref: "Role" }],
-    overrides: [{ type: String, ref: "Permission" }],
+    name: { 
+      type: String, 
+      required: true 
+    },
+
+    email: { 
+      type: String, 
+      required: true, 
+      unique: true 
+    },
+
+    password: { 
+      type: String, 
+      required: true 
+    },
+
+    roles: [
+      { 
+        type: Schema.Types.ObjectId, 
+        ref: "Role" 
+      }
+    ],
+
+    overrides: [
+      { 
+        type: Schema.Types.ObjectId, 
+        ref: "Permission" 
+      }
+    ],
   },
   { timestamps: true }
 );
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
+//to automatically infer types from schema
+export type User = InferSchemaType<typeof userSchema>;
 
-export default User;
+//real mongoose doc type 
+export type UserDocument = HydratedDocument<User>;
+
+//Prevent model overwrite
+const UserModel = 
+  mongoose.models.User as mongoose.Model<User> || mongoose.model<User>("User", userSchema);
+
+export default UserModel;
