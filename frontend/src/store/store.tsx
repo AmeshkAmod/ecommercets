@@ -1,6 +1,6 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import { persistStore, persistReducer } from "redux-persist";
-import storageModule from "redux-persist/lib/storage";
+import { persistStore, persistReducer, type PersistConfig} from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
 import cartReducer from "./slice/cartSlice";
 import productReducer from "./slice/productSlice";
@@ -11,7 +11,6 @@ import adminProductReducer from "./slice/adminProductSlice";
 import { attachAuthInterceptor } from "../api/api";
 
 /* ---------- FIX STORAGE (VITE ESM ISSUE) ---------- */
-const storage = storageModule.default || storageModule;
 
 /* ---------- ROOT REDUCER ---------- */
 const rootReducer = combineReducers({
@@ -22,15 +21,21 @@ const rootReducer = combineReducers({
   adminProducts: adminProductReducer,
 });
 
+/* ---------- ROOT STATE TYPE ---------- */
+export type RootState = ReturnType<typeof rootReducer>;
+
 /* ---------- PERSIST CONFIG ---------- */
-const persistConfig = {
+const persistConfig: PersistConfig<RootState> = {
   key: "root",
   storage, // ✅ now has getItem/setItem/removeItem
   whitelist: ["auth", "cart"],
 };
 
 /* ---------- PERSISTED REDUCER ---------- */
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer<RootState>(
+  persistConfig, 
+  rootReducer
+);
 
 /* ---------- STORE ---------- */
 export const store = configureStore({
@@ -41,8 +46,15 @@ export const store = configureStore({
     }),
 });
 
+/* --------TYPES------------- */
+export type AppDispatch = typeof store.dispatch;
+
 /* ---------- PERSISTOR ---------- */
 export const persistor = persistStore(store);
 
 /* ---------- AXIOS INTERCEPTOR ---------- */
-attachAuthInterceptor(() => store.getState().auth.token);
+attachAuthInterceptor(() => {
+  const state = store.getState();
+  return state.auth.user?.token ?? null;
+});
+

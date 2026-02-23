@@ -1,7 +1,28 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import type { User } from "../../types/user";
 import API from "../../api/api";
 
-export const loginUser = createAsyncThunk(
+interface AuthState {
+  token: string | null;
+  user: User | null;
+  isAuthenticated: boolean;
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+}
+
+const initialState: AuthState = {
+  token: null,
+  user: null,
+  isAuthenticated: false,
+  status: "idle",
+  error: null,
+}
+
+export const loginUser = createAsyncThunk<
+  { token: string; user: User },
+  { email: string; password: string },
+  { rejectValue: string }
+>(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
     try {
@@ -14,7 +35,7 @@ export const loginUser = createAsyncThunk(
       );
 
       return res.data; // { token, user }
-    } catch (error) {
+    } catch (error:any) {
       return rejectWithValue(
         error.response?.data?.message || "Login failed"
       );
@@ -24,13 +45,7 @@ export const loginUser = createAsyncThunk(
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: {
-    token: null,
-    user: null,
-    isAuthenticated: false,
-    status: "idle",
-    error: null,
-  },
+  initialState,
   reducers: {
     logout(state) {
       state.token = null;
@@ -52,7 +67,7 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = action.payload ?? "Login failed";
       });
   },
 });
