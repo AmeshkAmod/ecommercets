@@ -1,5 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import API from "../../api/api";
+import type { Order } from "../../types/order";
+import API from "../../api/api"
+
+interface adminOrderState {
+  order: Order[];
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+}
+
+const initialState: adminOrderState = {
+  orders: [],
+  status: "idle",
+  error: null,
+};
 
 export const fetchAllOrders = createAsyncThunk(
   "adminOrders/fetch",

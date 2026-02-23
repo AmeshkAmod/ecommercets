@@ -1,15 +1,19 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import AdminLayout from "./AdminLayout";
 import { fetchAllOrders } from "../../store/slice/adminOrderSlice";
+import type { Order } from "../../types/order";
 
 export default function AdminOrders() {
-  const dispatch = useDispatch();
-  const orders = useSelector(s => s.adminOrders.orders);
+  const dispatch = useAppDispatch();
+
+  const orders = useAppSelector(
+    (s) => s.adminOrders.orders
+  );
 
   useEffect(() => {
     dispatch(fetchAllOrders());
-  }, []);
+  }, [dispatch]);
 
   return (
     <AdminLayout>
@@ -26,7 +30,7 @@ export default function AdminOrders() {
           </tr>
         </thead>
         <tbody>
-          {orders.map(o => (
+          {orders.map((o: Order) => (
             <tr key={o._id} className="border-t border-gray-800">
               <td className="p-3">{o._id.slice(-6)}</td>
               <td>{o.user?.email}</td>
