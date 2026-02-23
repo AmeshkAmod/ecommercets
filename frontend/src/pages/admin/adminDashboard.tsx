@@ -14,7 +14,12 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ title, value }) {
+interface StatCardProps {
+  title: string;
+  value: string;
+}
+
+function StatCard({ title, value }: StatCardProps) {
   return (
     <div className="bg-black border border-gray-800 rounded-xl p-5">
       <p className="text-sm text-gray-400">{title}</p>
