@@ -1,14 +1,44 @@
- import mongoose from "mongoose";
-const RoleSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
+ import mongoose, { Schema, type Model } from "mongoose";
+ import type { InferSchemaType,HydratedDocument } from "mongoose";
 
-  permissions: [{ type: String }],
+ //schema
+const roleSchema = new Schema(
+  {
+    name: { 
+      type: String, 
+      required: true, 
+      trim: true,
+      uppercase: true,
+    },
 
-  inherits: [{ type: String }],   // names of parent roles
+    permissions: [
+      { 
+        type: String,
+        ref: "Permission",
+        required: true,
+      },
+    ],
 
-  overrides: [{ type: String }],  // only if roles have overrides (optional)
-});
+    inherits: [
+      {
+        type: String,
+      }
+    ]
+  },
+  { timestamps: true }
+);
 
-const Role=mongoose.models.Role || mongoose.model("Role",RoleSchema)
+//explicit unique index on role name
+roleSchema.index({ name: 1 }, { unique: true });
 
-export default Role;
+//infer type from schema
+export type Role = InferSchemaType<typeof roleSchema>;
+
+//hydrated doc type
+export type RoloDocument = HydratedDocument<Role>;
+
+//model
+const RoleModel: Model<Role> = 
+mongoose.models.Role || mongoose.model<Role>("Role",roleSchema)
+
+export default RoleModel;

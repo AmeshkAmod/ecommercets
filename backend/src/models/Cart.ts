@@ -1,15 +1,19 @@
+import { Schema,type Model} from "mongoose";
+import type { InferSchemaType, HydratedDocument } from "mongoose";
 import mongoose from "mongoose";
 
-const cartSchema = new mongoose.Schema({
+
+//Schema
+const cartSchema = new Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
   items: [
     {
       productId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Product",
         required: true,
       },
@@ -22,5 +26,14 @@ const cartSchema = new mongoose.Schema({
   ],
 }, { timestamps: true });
 
-const Cart = mongoose.models.Cart || mongoose.model("Cart", cartSchema);
-export default Cart;
+// to automatically infer types
+export type Cart = InferSchemaType<typeof cartSchema>
+
+// mongoosse model
+export type CartDocument = HydratedDocument<Cart>;
+
+
+const CartModel:Model<Cart> =
+  mongoose.models.Cart || mongoose.model<Cart>("Cart", cartSchema);
+
+export default CartModel;
