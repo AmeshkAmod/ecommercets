@@ -1,12 +1,31 @@
+import type { Product } from "../../types/product";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../../api/api";
 
-export const fetchProducts = createAsyncThunk(
+interface AdminProductState {
+  products: Product[];
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+}
+
+const initialState: AdminProductState = {
+  products: [],
+  status: "idle",
+  error: null,
+}
+
+export const fetchProducts = createAsyncThunk<Product[]>(
   "adminProducts/fetch",
-  async () => (await API.get("/products")).data
+  async () => {
+    const res = await API.get("/products");
+    return res.data;
+  }
 );
 
-export const updateProduct = createAsyncThunk(
+export const updateProduct = createAsyncThunk<
+  Product,
+  { id: string; price: number; countInStock: number }
+>(
   "adminProducts/update",
   async ({ id, price, countInStock }) => {
     const res = await API.put(`/products/${id}`, {
@@ -17,7 +36,10 @@ export const updateProduct = createAsyncThunk(
   }
 );
 
-export const deleteProduct = createAsyncThunk(
+export const deleteProduct = createAsyncThunk<
+  string,
+  string
+>(
   "adminProducts/delete",
   async (id) => {
     await API.delete(`/products/${id}`);
@@ -25,12 +47,16 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
-export const addProduct = createAsyncThunk(
+export const addProduct = createAsyncThunk<
+  Product,
+  { title: string; price: number; countInStock: number }
+>(
   "adminProducts/add",
   async ({ title, price, countInStock }) => {
     const res = await API.post("/products", {
       title,
-      price,countInStock,
+      price,
+      countInStock,
     });
     return res.data; // newly created product
   }
@@ -38,11 +64,8 @@ export const addProduct = createAsyncThunk(
 
 const slice = createSlice({
   name: "addProducts",
-  initialState: { 
-    products: [],
-    status: "idle",
-    error: null, 
-  },
+  initialState,
+  reducers: {},
   extraReducers: (builder) => {
     builder
     /* fetch */

@@ -50,7 +50,7 @@ const slice = createSlice({
       state.status = "failed";
       state.error = 
         typeof action.payload === "string"
-        ? action.payload : "Error failed to fetch orders";
+        ? action.payload : "Error failed to fetch orders ";
     })
     .addCase(updateOrderStatus.fulfilled, (state, action) => {
       const index = state.order.findIndex(

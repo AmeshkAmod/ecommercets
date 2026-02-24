@@ -1,18 +1,31 @@
+import type { CartItem } from "../../types/cart";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../../api/api";
+
+interface CartState {
+  items: CartItem[];
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+}
+
+const initialState: CartState = {
+  items: [],
+  status: "idle",
+  error: null,
+};
 
 /* =========================
    FETCH CART
    GET /api/cart
 ========================= */
-export const fetchCart = createAsyncThunk(
+export const fetchCart = createAsyncThunk<CartItem[]>(
   "cart/fetch",
   async (_, { rejectWithValue }) => {
     try {
       const res = await API.get("/cart");
       // backend returns { userId, items }
       return res.data.items;
-    } catch (err) {
+    } catch (err: any) {
       return rejectWithValue(
         err.response?.data || "Failed to fetch cart"
       );
@@ -24,7 +37,10 @@ export const fetchCart = createAsyncThunk(
    ADD TO CART
    POST /api/cart/add
 ========================= */
-export const addToCart = createAsyncThunk(
+export const addToCart = createAsyncThunk<
+  CartItem[],
+  string
+>(
   "cart/add",
   async (productId, { rejectWithValue }) => {
     try {
@@ -35,7 +51,7 @@ export const addToCart = createAsyncThunk(
 
       // backend returns { cart: { items } }
       return res.data.cart.items;
-    } catch (err) {
+    } catch (err: any) {
       return rejectWithValue(
         err.response?.data || "Add to cart failed"
       );
@@ -47,7 +63,10 @@ export const addToCart = createAsyncThunk(
    UPDATE CART ITEM QUANTITY
    PUT /api/cart/update
 ========================= */
-export const updateCartItem = createAsyncThunk(
+export const updateCartItem = createAsyncThunk<
+  CartItem[],
+  { productId: string; quantity: number }
+>(
   "cart/update",
   async ({ productId, quantity }, { rejectWithValue }) => {
     try {
@@ -58,7 +77,7 @@ export const updateCartItem = createAsyncThunk(
 
       // backend returns { cart: { items } }
       return res.data.cart.items;
-    } catch (err) {
+    } catch (err: any) {
       return rejectWithValue(
         err.response?.data || "Update cart failed"
       );
@@ -70,7 +89,10 @@ export const updateCartItem = createAsyncThunk(
    REMOVE FROM CART
    DELETE /api/cart/remove
 ========================= */
-export const removeFromCart = createAsyncThunk(
+export const removeFromCart = createAsyncThunk<
+  CartItem[],
+  string
+>(
   "cart/remove",
   async (productId, { rejectWithValue }) => {
     try {
@@ -79,7 +101,7 @@ export const removeFromCart = createAsyncThunk(
       });
 
       return res.data.cart.items;
-    } catch (err) {
+    } catch (err: any) {
       return rejectWithValue(
         err.response?.data || "Remove from cart failed"
       );
@@ -92,13 +114,7 @@ export const removeFromCart = createAsyncThunk(
 ========================= */
 const cartSlice = createSlice({
   name: "cart",
-
-  initialState: {
-    items: [],
-    status: "idle", // idle | loading | succeeded | failed
-    error: null,
-  },
-
+  initialState,
   reducers: {
     clearCart: (state) => {
       state.items = [];
@@ -120,7 +136,9 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error =
+        typeof action.payload === "string"
+        ? action.payload : "Fetch failed";
       })
 
       /* ---------- ADD TO CART ---------- */
@@ -133,7 +151,9 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = 
+        typeof action.payload === "string"
+        ? action.payload : "Add failed";
       })
 
       /* ---------- UPDATE CART ITEM ---------- */
@@ -146,7 +166,9 @@ const cartSlice = createSlice({
       })
       .addCase(updateCartItem.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = 
+        typeof action.payload === "string"
+        ? action.payload : "Update failed";
       })
 
       /* ---------- REMOVE FROM CART ---------- */
@@ -159,7 +181,9 @@ const cartSlice = createSlice({
       })
       .addCase(removeFromCart.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = 
+        typeof action.payload === "string"
+        ? action.payload : "Remove failed";
       });
   },
 });
