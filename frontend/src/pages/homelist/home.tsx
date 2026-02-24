@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useSearchParams } from "react-router-dom";
 import { fetchProducts } from "../../store/slice/productSlice";
 import { Navigate } from "react-router-dom";
@@ -8,9 +8,14 @@ import Hero from "../../components/Hero";
 import ProductGrid from "../../components/ProductGrid";
 
 export default function Home() {
-  const dispatch = useDispatch();
-  const { list, status } = useSelector((state) => state.product);
-  const user = useSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
+
+  const { products, status } = useAppSelector(
+    (state) => state.product
+  );
+  const user = useAppSelector(
+    (state) => state.auth.user
+  );
 
   // read search query from URL
   const [searchParams] = useSearchParams();
@@ -21,12 +26,12 @@ export default function Home() {
   }, [dispatch]);
 
   //redirect to admin after login
-  if (user?.isAdmin) {
+  if (user?.role === "admin") {
     return <Navigate to="/admin" replace />;
   }
 
   // filter products based on search query
-  const filteredProducts = list.filter((p) =>
+  const filteredProducts = products.filter((p) =>
     p.title.toLowerCase().includes(query)
   );
 
