@@ -8,7 +8,10 @@ export interface OrderItem {
 
 export interface Order {
   _id: string;
-  user: string;
+  user: string | {
+    _id: string;
+    email: string;
+  }
   items: OrderItem[];
   total: number;
   paymentMethod: string;

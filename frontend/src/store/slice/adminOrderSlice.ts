@@ -3,13 +3,13 @@ import type { Order } from "../../types/order";
 import API from "../../api/api"
 
 interface adminOrderState {
-  order: Order[];
+  orders: Order[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
 const initialState: adminOrderState = {
-  order: [],
+  orders: [],
   status: "idle",
   error: null,
 };
@@ -44,7 +44,7 @@ const slice = createSlice({
     })
     .addCase(fetchAllOrders.fulfilled, (state, action) => {
       state.status = "succeeded";
-      state.order = action.payload;
+      state.orders = action.payload;
     })
     .addCase(fetchAllOrders.rejected, (state, action) => {
       state.status = "failed";
@@ -53,11 +53,11 @@ const slice = createSlice({
         ? action.payload : "Error failed to fetch orders ";
     })
     .addCase(updateOrderStatus.fulfilled, (state, action) => {
-      const index = state.order.findIndex(
+      const index = state.orders.findIndex(
         (o) => o._id === action.payload._id
       );
       if (index !== -1) {
-        state.order[index] = action.payload;
+        state.orders[index] = action.payload;
       }
     });
   },
