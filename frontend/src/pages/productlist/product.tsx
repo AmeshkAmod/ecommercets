@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
 import Navbar from "../../components/Navbar";
 import ProductImages from "../../components/ProductImages";
@@ -12,15 +12,16 @@ import { fetchProductById } from "../../store/slice/productSlice";
 
 export default function Product() {
   const { id } = useParams();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // ✅ FIRST: read from Redux
-  const product = useSelector((state) =>
-    state.product.list.find((p) => String(p._id) === id)
+  const product = useAppSelector((state) =>
+    state.product.products.find((p) => String(p._id) === id)
   );
 
   // ✅ THEN: fetch if missing (reload / direct URL)
   useEffect(() => {
+    if (!id) return;
     if (!product) {
       dispatch(fetchProductById(id));
     }
