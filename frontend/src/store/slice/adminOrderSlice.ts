@@ -9,12 +9,12 @@ interface adminOrderState {
 }
 
 const initialState: adminOrderState = {
-  orders: [],
+  order: [],
   status: "idle",
   error: null,
 };
 
-export const fetchAllOrders = createAsyncThunk(
+export const fetchAllOrders = createAsyncThunk<Order[]>(
   "adminOrders/fetch",
   async () => {
     const res = await API.get("/orders");
@@ -22,7 +22,10 @@ export const fetchAllOrders = createAsyncThunk(
   }
 );
 
-export const updateOrderStatus = createAsyncThunk(
+export const updateOrderStatus = createAsyncThunk<
+  Order,
+  { orderId: string; status: string }
+>(
   "adminOrders/updateStatus",
   async ({ orderId, status }) => {
     const res = await API.put(`/orders/${orderId}`, { status });
@@ -32,10 +35,30 @@ export const updateOrderStatus = createAsyncThunk(
 
 const slice = createSlice({
   name: "adminOrders",
-  initialState: { orders: [], status: "idle" },
+  initialState,
+  reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchAllOrders.fulfilled, (state, action) => {
-      state.orders = action.payload;
+    builder
+      .addCase(fetchAllOrders.pending, (state) => {
+        state.status = "loading";
+    })
+    .addCase(fetchAllOrders.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.order = action.payload;
+    })
+    .addCase(fetchAllOrders.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = 
+        typeof action.payload === "string"
+        ? action.payload : "Error failed to fetch orders";
+    })
+    .addCase(updateOrderStatus.fulfilled, (state, action) => {
+      const index = state.order.findIndex(
+        (o) => o._id === action.payload._id
+      );
+      if (index !== -1) {
+        state.order[index] = action.payload;
+      }
     });
   },
 });
