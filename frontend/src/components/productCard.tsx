@@ -1,26 +1,33 @@
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/slice/cartSlice";
 import { useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
+import type { Product } from "../types/product";
+import type { RootState, AppDispatch } from "../store/store";
 
-export default function ProductCard({ product }) {
-  const dispatch = useDispatch();
+interface ProductCardProps {
+  product: Product;
+}
+
+export default function ProductCard({ product }: ProductCardProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useSelector((s) => s.auth);
-  const cartStatus = useSelector((s) => s.cart.status);
-  const [added, setAdded] = useState(false);
+
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  const cartStatus = useSelector((state: RootState) => state.cart.status);
+
+  const [added, setAdded] = useState<boolean>(false);
 
   if (!product) return null;
 
-  const stock =
-    product.countInStock ??
-    product.stock ??
-    product.quantity ??
-    0;
+  const stock = product.countInStock ?? 0;
 
   const inStock = stock > 0;
 
-  const handleAddToCart = async (e) => {
+  const handleAddToCart = async (
+    e: MouseEvent<HTMLButtonElement>,
+  ): Promise<void> => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -32,6 +39,7 @@ export default function ProductCard({ product }) {
     if (!inStock) return;
 
     const res = await dispatch(addToCart(product._id));
+
     if (res.meta.requestStatus === "fulfilled") {
       setAdded(true);
       setTimeout(() => setAdded(false), 1200);
@@ -40,7 +48,6 @@ export default function ProductCard({ product }) {
 
   return (
     <div className="bg-black border border-gray-800 rounded-xl p-4 text-gray-200 flex flex-col hover:border-yellow-400 transition">
-
       <Link to={`/product/${product._id}`}>
         <img
           src={product.image}
@@ -49,15 +56,15 @@ export default function ProductCard({ product }) {
         />
       </Link>
 
-      <h3 className="text-sm font-semibold line-clamp-2">
-        {product.title}
-      </h3>
+      <h3 className="text-sm font-semibold line-clamp-2">{product.title}</h3>
 
-      <p className="text-yellow-400 font-bold mt-1">
-        ₹{product.price}
-      </p>
+      <p className="text-yellow-400 font-bold mt-1">₹{product.price}</p>
 
-      <p className={`text-xs mt-1 ${inStock ? "text-green-400" : "text-red-400"}`}>
+      <p
+        className={`text-xs mt-1 ${
+          inStock ? "text-green-400" : "text-red-400"
+        }`}
+      >
         {inStock ? `${stock} left in stock` : "Out of stock"}
       </p>
 
@@ -73,10 +80,18 @@ export default function ProductCard({ product }) {
           onClick={handleAddToCart}
           disabled={!inStock || cartStatus === "loading"}
           className={`flex-1 py-2 rounded-full text-xs font-semibold transition
-            ${added ? "bg-green-500 text-black" : "bg-yellow-400 text-black hover:brightness-110"}
+            ${
+              added
+                ? "bg-green-500 text-black"
+                : "bg-yellow-400 text-black hover:brightness-110"
+            }
             disabled:opacity-50 disabled:cursor-not-allowed`}
         >
-          {added ? "✔ Added" : cartStatus === "loading" ? "Adding..." : "Add to Cart"}
+          {added
+            ? "✔ Added"
+            : cartStatus === "loading"
+              ? "Adding..."
+              : "Add to Cart"}
         </button>
       </div>
     </div>

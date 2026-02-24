@@ -1,17 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { logout } from "../store/slice/authSlice";
 import { fetchCart } from "../store/slice/cartSlice";
+import type { RootState, AppDispatch } from "../store/store";
 
 export default function Navbar() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { isAuthenticated } = useSelector((s) => s.auth);
-  const cartItems = useSelector((s) => s.cart.items);
+  const { isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
 
-  const [search, setSearch] = useState("");
+  const cartItems = useSelector(
+    (state: RootState) => state.cart.items
+  );
+
+  const [search, setSearch] = useState<string>("");
 
   // 🔥 fetch cart on load / refresh
   useEffect(() => {
@@ -27,7 +33,7 @@ export default function Navbar() {
   );
 
   // 🔍 SEARCH HANDLER
-  const handleSearch = (e) => {
+  const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!search.trim()) return;
 
@@ -39,7 +45,6 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-[#020617] border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
 
-        {/* Logo */}
         <Link
           to="/"
           className="text-xl font-extrabold tracking-wide text-gray-100"
@@ -47,7 +52,6 @@ export default function Navbar() {
           Dark<span className="text-yellow-400">.</span>Cart
         </Link>
 
-        {/* 🔍 Search */}
         <form onSubmit={handleSearch} className="flex-1 relative">
           <input
             type="text"
@@ -57,7 +61,6 @@ export default function Navbar() {
             className="w-full bg-black border border-gray-700 rounded-full px-4 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition"
           />
 
-          {/* Search icon */}
           <button
             type="submit"
             className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition"
@@ -66,7 +69,6 @@ export default function Navbar() {
           </button>
         </form>
 
-        {/* Right Actions */}
         <nav className="flex items-center gap-5 text-sm text-gray-300">
 
           {isAuthenticated && (
@@ -97,7 +99,6 @@ export default function Navbar() {
             </button>
           )}
 
-          {/* 🛒 CART WITH COUNT */}
           <Link
             to="/cart"
             className="relative border border-gray-700 px-4 py-1.5 rounded-full hover:border-yellow-400 transition"

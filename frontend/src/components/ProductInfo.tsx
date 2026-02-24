@@ -1,4 +1,10 @@
-export default function ProductInfo({ product }) {
+import type { Product } from "../types/product";
+
+interface ProductInfoProps {
+  product: Product;
+}
+
+export default function ProductInfo({ product }: ProductInfoProps) {
   return (
     <div className="bg-[#020617] border border-gray-800 rounded-xl p-5">
       <span className="inline-block text-xs px-3 py-1 rounded-full border border-gray-600 text-gray-300 mb-3">
@@ -10,10 +16,10 @@ export default function ProductInfo({ product }) {
       {/* Rating */}
       <div className="flex items-center gap-2 text-sm mt-2">
         <span className="text-yellow-400">
-          {"★".repeat(Math.round(product.rating || 4))}
+          {"★".repeat(Math.round(product.rating ?? 4))}
         </span>
         <span className="text-gray-400">
-          ({product.numReviews || 0} reviews)
+          ({product.numReviews ?? 0} reviews)
         </span>
       </div>
 
