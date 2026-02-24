@@ -8,7 +8,7 @@ export default function AdminOrders() {
   const dispatch = useAppDispatch();
 
   const orders = useAppSelector(
-    (s) => s.adminOrders.orders
+    (s) => s.adminOrders.order
   );
 
   useEffect(() => {
