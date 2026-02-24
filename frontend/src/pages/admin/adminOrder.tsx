@@ -33,7 +33,10 @@ export default function AdminOrders() {
           {orders.map((o: Order) => (
             <tr key={o._id} className="border-t border-gray-800">
               <td className="p-3">{o._id.slice(-6)}</td>
-              <td>{o.user?.email}</td>
+              <td>
+                {typeof o.user === "string"
+                ? "Unknown" : o.user.email}
+              </td>
               <td>₹{o.total}</td>
               <td>{o.status}</td>
               <td>{new Date(o.createdAt).toLocaleDateString()}</td>
