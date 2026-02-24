@@ -1,34 +1,41 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { submitReview } from "../store/slice/productSlice";
+import type { Product } from "../types/product";
+import type { RootState, AppDispatch } from "../store/store";
 
-export default function ProductReviews({ product }) {
-  const dispatch = useDispatch();
+interface ProductReviewsProps {
+  product: Product;
+}
+
+export default function ProductReviews({ product }: ProductReviewsProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useSelector((state) => state.auth);
 
-  const [rating, setRating] = useState("");
-  const [comment, setComment] = useState("");
+  const { isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
 
-  const submitHandler = () => {
-    // 🔐 must be logged in
+  const [rating, setRating] = useState<number | "">("");
+  const [comment, setComment] = useState<string>("");
+
+  const submitHandler = async (): Promise<void> => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
 
-    if (!rating || !comment) return;
+    if (!rating || !comment.trim()) return;
 
-    dispatch(
+    await dispatch(
       submitReview({
         productId: product._id,
-        rating,
+        rating: Number(rating),
         comment,
       })
     );
 
-    // reset form
     setRating("");
     setComment("");
   };
@@ -46,7 +53,9 @@ export default function ProductReviews({ product }) {
           <div className="flex justify-between text-sm">
             <span className="font-semibold">{review.name}</span>
             <span className="text-gray-500">
-              {new Date(review.createdAt).toLocaleDateString()}
+              {review.createdAt
+                ? new Date(review.createdAt).toLocaleDateString()
+                : ""}
             </span>
           </div>
 
@@ -66,7 +75,9 @@ export default function ProductReviews({ product }) {
 
         <select
           value={rating}
-          onChange={(e) => setRating(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+            setRating(e.target.value ? Number(e.target.value) : "")
+          }
           className="w-full mb-2 bg-[#020617] border border-gray-700 rounded p-2 text-sm"
         >
           <option value="">Select rating</option>
@@ -79,7 +90,9 @@ export default function ProductReviews({ product }) {
 
         <textarea
           value={comment}
-          onChange={(e) => setComment(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+            setComment(e.target.value)
+          }
           placeholder="Share your experience…"
           className="w-full bg-[#020617] border border-gray-700 rounded p-2 text-sm"
         />

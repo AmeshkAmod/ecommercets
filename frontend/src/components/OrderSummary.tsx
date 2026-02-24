@@ -1,4 +1,10 @@
-export default function OrderSummary({ items }) {
+import type { CartItem } from "../types/cart";
+
+interface OrderSummaryProps {
+  items: CartItem[];
+}
+
+export default function OrderSummary({ items }: OrderSummaryProps) {
   const totalQty = items.reduce(
     (sum, i) => sum + i.quantity,
     0
