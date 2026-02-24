@@ -1,12 +1,17 @@
 import { useDispatch } from "react-redux";
+import type { CartItem } from "../types/cart";
+import type { AppDispatch } from "../store/store";
 import {
-  addToCart,
   removeFromCart,
   updateCartItem,
 } from "../store/slice/cartSlice";
 
-export default function CartItem({ item }) {
-  const dispatch = useDispatch();
+interface CartItemProps {
+  item: CartItem;
+}
+
+export default function CartItem({ item }: CartItemProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const product = item.productId;
 
   if (!product) return null;
@@ -35,8 +40,6 @@ export default function CartItem({ item }) {
 
   return (
     <div className="grid grid-cols-[100px_1fr] gap-4 bg-[#020617] border border-gray-800 rounded-xl p-4">
-
-      {/* Image */}
       <div className="flex items-center justify-center border border-gray-800 rounded-lg p-2">
         <img
           src={product.image}
@@ -45,14 +48,11 @@ export default function CartItem({ item }) {
         />
       </div>
 
-      {/* Info */}
       <div className="flex flex-col gap-1">
         <h3 className="text-sm font-semibold">{product.title}</h3>
         <p className="text-yellow-400 font-bold">₹{product.price}</p>
 
         <div className="flex justify-between items-center mt-2 gap-2">
-
-          {/* Quantity Control */}
           <div className="flex items-center border border-gray-700 rounded-full overflow-hidden">
             <button
               onClick={handleDecrease}
@@ -73,7 +73,6 @@ export default function CartItem({ item }) {
             </button>
           </div>
 
-          {/* Remove */}
           <button
             onClick={() => dispatch(removeFromCart(product._id))}
             className="text-xs text-red-400 border border-red-400 px-3 py-1 rounded-full hover:bg-red-500/10"

@@ -1,11 +1,18 @@
-import type { CartItem } from "./cart";
+// types/order.ts
+
+export interface OrderItem {
+  product: string;
+  qty: number;
+  price: number;
+}
 
 export interface Order {
-    _id: string;
-    user?: {
-        email: string;
-    };
-    total: number;
-    status: string;
-    createdAt: string;
+  _id: string;
+  user: string;
+  items: OrderItem[];
+  total: number;
+  paymentMethod: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }

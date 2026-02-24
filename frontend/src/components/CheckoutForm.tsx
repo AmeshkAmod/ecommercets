@@ -1,14 +1,30 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import API from "../api/api";
 import { clearCart } from "../store/slice/cartSlice";
+import type { CartItem } from "../types/cart";
+import type { AppDispatch } from "../store/store";
+import axios from "axios";
 
-export default function CheckoutForm({ items }) {
+interface CheckoutFormProps {
+  items: CartItem[];
+}
+
+interface ShippingAddress {
+  name: string;
+  phone: string;
+  line: string;
+  city: string;
+  postal: string;
+  country: string;
+}
+
+export default function CheckoutForm({ items }: CheckoutFormProps) {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const [address, setAddress] = useState({
+  const [address, setAddress] = useState<ShippingAddress>({
     name: "",
     phone: "",
     line: "",
@@ -17,18 +33,22 @@ export default function CheckoutForm({ items }) {
     country: "India",
   });
 
-  const [payment, setPayment] = useState("COD");
-  const [status, setStatus] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [payment, setPayment] = useState<string>("COD");
+  const [status, setStatus] = useState<string>("");
+  const [success, setSuccess] = useState<boolean>(false);
 
-  const handleChange = (e) => {
-    setAddress({ ...address, [e.target.name]: e.target.value });
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setAddress((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const placeOrder = async () => {
+  const placeOrder = async (): Promise<void> => {
     setStatus("");
 
-    // 🛑 Validation
     if (!address.name || !address.line || !address.city || !address.postal) {
       setStatus("Please fill all required address fields.");
       return;
@@ -40,7 +60,6 @@ export default function CheckoutForm({ items }) {
     }
 
     try {
-      // ✅ BUILD ORDER PAYLOAD (THIS WAS MISSING)
       const orderItems = items.map((item) => ({
         product: item.productId._id,
         qty: item.quantity,
@@ -58,19 +77,20 @@ export default function CheckoutForm({ items }) {
         paymentMethod: payment,
       });
 
-      // ✅ success flow
       setSuccess(true);
       setStatus("✅ Order placed successfully!");
       dispatch(clearCart());
 
-      // ⏳ redirect to home
       setTimeout(() => {
         navigate("/");
       }, 2000);
 
-    } catch (err) {
-      console.error("ORDER ERROR:", err.response?.data || err.message);
-      setStatus(err.response?.data?.message || "Order failed");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setStatus(err.response?.data?.message || "Order failed");
+      } else {
+        setStatus("Something went wrong");
+      }
     }
   };
 
@@ -78,15 +98,16 @@ export default function CheckoutForm({ items }) {
     <section className="bg-[#020617] border border-gray-800 rounded-xl p-5">
       <h2 className="font-semibold mb-4">Shipping Address</h2>
 
-      {/* Address Fields */}
-      {[
-        { label: "Full Name", name: "name" },
-        { label: "Phone", name: "phone" },
-        { label: "Address Line", name: "line" },
-        { label: "City", name: "city" },
-        { label: "Postal Code", name: "postal" },
-        { label: "Country", name: "country" },
-      ].map((f) => (
+      {(
+        [
+          { label: "Full Name", name: "name" },
+          { label: "Phone", name: "phone" },
+          { label: "Address Line", name: "line" },
+          { label: "City", name: "city" },
+          { label: "Postal Code", name: "postal" },
+          { label: "Country", name: "country" },
+        ] as { label: string; name: keyof ShippingAddress }[]
+      ).map((f) => (
         <div key={f.name} className="mb-3">
           <label className="block text-xs text-gray-400 mb-1">
             {f.label}
@@ -101,7 +122,6 @@ export default function CheckoutForm({ items }) {
         </div>
       ))}
 
-      {/* Payment */}
       <h2 className="font-semibold mt-5 mb-2">Payment Method</h2>
 
       <div className="flex flex-col gap-2 text-sm">

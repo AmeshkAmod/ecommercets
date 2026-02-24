@@ -1,16 +1,25 @@
 import { useNavigate } from "react-router-dom";
+import type { CartItem } from "../types/cart";
 
-export default function CartSummary({ items }) {
+interface CartSummaryProps {
+  items: CartItem[];
+}
+
+export default function CartSummary({ items }: CartSummaryProps) {
   const navigate = useNavigate();
 
-  const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
+  const totalQty = items.reduce(
+    (sum: number, i: CartItem) => sum + i.quantity,
+    0
+  );
+
   const subtotal = items.reduce(
-    (sum, i) => sum + i.productId.price * i.quantity,
+    (sum: number, i: CartItem) =>
+      sum + i.productId.price * i.quantity,
     0
   );
 
   const handleCheckout = () => {
-    console.log("Proceed to checkout clicked"); // ✅ debug
     if (items.length === 0) return;
     navigate("/checkout");
   };
