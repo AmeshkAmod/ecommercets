@@ -8,7 +8,7 @@ export default function Hero() {
       : "Good evening";
 
   return (
-    <section className="relative mb-8 rounded-xl overflow-hidden border border-slate-700 bg-gradient-to-r from-[#18181b] via-[#1f1f2e] to-[#18181b]">
+    <section className="relative mb-8 rounded-xl overflow-hidden border border-slate-700 bg-linear-to-r from-[#18181b] via-[#1f1f2e] to-[#18181b]">
 
       {/* Glow effects */}
       <div className="absolute -top-16 -right-16 w-56 h-56 bg-fuchsia-500/10 blur-3xl rounded-full"></div>

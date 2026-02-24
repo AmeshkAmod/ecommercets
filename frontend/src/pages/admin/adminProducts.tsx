@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import type { Product } from "../../types/product";
 import AdminLayout from "./AdminLayout";
 import { 
   fetchProducts,
@@ -9,16 +10,16 @@ import {
  } from "../../store/slice/adminProductSlice";
 
 export default function AdminProducts() {
-  const dispatch = useDispatch();
-  const products = useSelector(s => s.adminProducts.products);
+  const dispatch = useAppDispatch();
+  const products = useAppSelector(s => s.adminProducts.products);
 
-  const [title, setTitle] = useState("");
-  const [newPrice, setNewPrice] = useState("");
-  const [newStock, setNewStock] = useState("");
+  const [title, setTitle] = useState<string>("");
+  const [newPrice, setNewPrice] = useState<string>("");
+  const [newStock, setNewStock] = useState<string>("");
 
-  const [editingId, setEditingId] = useState(null)
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [price, setPrice] = useState<string>("");
+  const [stock, setStock] = useState<string>("");
 
 
   useEffect(() => {
@@ -42,13 +43,13 @@ export default function AdminProducts() {
     setNewStock("");
   };
 
-  const startEdit = (product) => {
+  const startEdit = (product: Product) => {
     setEditingId(product._id);
-    setPrice(product.price);
-    setStock(product.countInStock);
+    setPrice(String(product.price));
+    setStock(String(product.countInStock));
   };
 
-  const saveEdit = (id) => {
+  const saveEdit = (id: string) => {
     dispatch(
       updateProduct({
         id,
