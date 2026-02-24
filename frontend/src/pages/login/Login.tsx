@@ -1,34 +1,50 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loginUser } from "../../store/slice/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function Login() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { status, error } = useSelector((s) => s.auth);
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
-  const [form, setForm] = useState({
+export default function Login() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const { status, error } = useAppSelector((state) => state.auth);
+
+  const [form, setForm] = useState<LoginForm>({
     email: "",
     password: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (
+    e: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
-    const res = await dispatch(loginUser(form));
-    if (res.meta.requestStatus === "fulfilled") {
-      const user = res.payload;
 
-      if (user.isAdmin) {
+    try {
+      // unwrap gives you typed user directly
+      const user = await dispatch(loginUser(form)).unwrap();
+
+      if (user.role === "admin") {
         navigate("/admin");
       } else {
-        navigate("/")
+        navigate("/");
       }
+    } catch (err) {
+      // error already handled in slice
+      console.error("Login failed:", err);
     }
   };
 
@@ -41,12 +57,13 @@ export default function Login() {
           <h1 className="text-3xl font-extrabold text-center tracking-wide mb-1">
             Dark<span className="text-yellow-400">.</span>Cart
           </h1>
+
           <p className="text-center text-xs text-gray-400 mb-6">
             Sign in to continue shopping
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            
+
             {/* Email */}
             <div>
               <label className="text-xs text-gray-400 mb-1 block">
@@ -88,7 +105,7 @@ export default function Login() {
               </p>
             )}
 
-            {/* Button */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={status === "loading"}
@@ -110,6 +127,7 @@ export default function Login() {
               Create one
             </Link>
           </p>
+
         </div>
       </div>
     </div>
