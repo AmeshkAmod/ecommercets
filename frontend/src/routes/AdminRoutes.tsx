@@ -1,10 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { useAppSelector } from "../store/hooks";
 
 export default function AdminRoute(){
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { token, user} = useAppSelector(
+    (state) => state.auth
+  );
 
-  if (!token || !user?.isAdmin) {
+  if (!token || user?.role !== "admin") {
     return <Navigate to="/login" replace />;
   }
 
