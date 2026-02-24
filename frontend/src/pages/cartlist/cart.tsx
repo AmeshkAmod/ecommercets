@@ -4,10 +4,14 @@ import Navbar from "../../components/Navbar";
 import CartItem from "../../components/CartItem";
 import CartSummary from "../../components/CartSummary";
 import { fetchCart } from "../../store/slice/cartSlice";
+import type { RootState, AppDispatch } from "../../store/store";
 
 export default function Cart() {
-  const dispatch = useDispatch();
-  const items = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const items = useSelector(
+    (state: RootState) => state.cart.items
+  );
 
   useEffect(() => {
     dispatch(fetchCart());
@@ -23,12 +27,17 @@ export default function Cart() {
           <h2 className="font-semibold mb-4">Your Shopping Cart</h2>
 
           {items.length === 0 && (
-            <p className="text-gray-400 text-sm">Your cart is empty.</p>
+            <p className="text-gray-400 text-sm">
+              Your cart is empty.
+            </p>
           )}
 
           <div className="flex flex-col gap-4">
             {items.map((item) => (
-              <CartItem key={item.productId._id} item={item} />
+              <CartItem
+                key={item.productId._id}
+                item={item}
+              />
             ))}
           </div>
         </section>
