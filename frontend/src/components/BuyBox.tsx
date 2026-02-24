@@ -1,8 +1,14 @@
 import { useDispatch } from "react-redux";
 import { addToCart } from "../store/slice/cartSlice";
+import type { Product } from "../types/product";
+import type { AppDispatch } from "../store/store";
 
-export default function BuyBox({ product }) {
-  const dispatch = useDispatch();
+interface BuyBoxProps {
+  product: Product;
+}
+
+export default function BuyBox({ product }: BuyBoxProps) {
+  const dispatch = useDispatch<AppDispatch>();
 
   return (
     <aside className="bg-[#020617] border border-gray-800 rounded-xl p-5">
