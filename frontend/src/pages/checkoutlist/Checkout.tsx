@@ -4,10 +4,14 @@ import Navbar from "../../components/Navbar";
 import CheckoutForm from "../../components/CheckoutForm";
 import OrderSummary from "../../components/OrderSummary";
 import { fetchCart } from "../../store/slice/cartSlice";
+import type { RootState, AppDispatch } from "../../store/store";
 
 export default function Checkout() {
-  const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const cartItems = useSelector(
+    (state: RootState) => state.cart.items
+  );
 
   useEffect(() => {
     dispatch(fetchCart());
