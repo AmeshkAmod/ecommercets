@@ -8,7 +8,7 @@ export interface OrderItem {
 
 export interface Order {
   _id: string;
-  user: string | {
+  user: {
     _id: string;
     email: string;
   }
