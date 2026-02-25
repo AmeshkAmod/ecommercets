@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { User } from "../../types/user";
 import API from "../../api/api";
+import { PermissionKeys } from "../../types/auth";
+import type { AuthUser, Role } from "../../types/auth";
 
 interface AuthState {
+  user: AuthUser | null;
   token: string | null;
-  user: User | null;
-  isAuthenticated: boolean;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -13,13 +13,12 @@ interface AuthState {
 const initialState: AuthState = {
   token: null,
   user: null,
-  isAuthenticated: false,
   status: "idle",
   error: null,
 };
 
 export const loginUser = createAsyncThunk<
-  User,
+  AuthUser,
   { email: string; password: string },
   { rejectValue: string }
 >(
@@ -27,7 +26,6 @@ export const loginUser = createAsyncThunk<
   async (credentials, { rejectWithValue }) => {
     try {
       const res = await API.post("/auth/login", credentials);
-
       const { token, user } = res.data;
 
       localStorage.setItem("token", token);
@@ -49,7 +47,6 @@ const authSlice = createSlice({
     logout(state) {
       state.token = null;
       state.user = null;
-      state.isAuthenticated = false;
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     },
@@ -64,7 +61,6 @@ const authSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload;
         state.token = localStorage.getItem("token");
-        state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";

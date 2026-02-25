@@ -2,6 +2,8 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loginUser } from "../../store/slice/authSlice";
 import { Link, useNavigate } from "react-router-dom";
+import { PermissionKeys } from "../../types/auth";
+import  { AuthUser } from "../../types/auth";
 
 interface LoginForm {
   email: string;
@@ -37,7 +39,12 @@ export default function Login() {
       // unwrap gives you typed user directly
       const user = await dispatch(loginUser(form)).unwrap();
 
-      if (user.role === "admin") {
+      const getpermissions = (user: AuthUser) =>
+      user.role.flatMap(r => r.permissions);
+
+      const permissions = getpermissions(user);
+
+      if (permissions.includes(PermissionKeys.CREATE_PRODUCT)) {
         navigate("/admin");
       } else {
         navigate("/");
@@ -49,8 +56,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#020617] via-black to-[#020617] px-4">
-      <div className="relative w-full max-w-sm rounded-3xl p-[1px] bg-gradient-to-br from-yellow-400/30 to-transparent">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#020617] via-black to-[#020617] px-4">
+      <div className="relative w-full max-w-sm rounded-3xl p-px bg-linear-to-br from-yellow-400/30 to-transparent">
         <div className="bg-[#020617]/90 backdrop-blur-xl rounded-3xl p-7 text-gray-200 shadow-2xl">
 
           {/* Logo */}

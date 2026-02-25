@@ -6,7 +6,7 @@ import Cart from "../pages/cartlist/cart";
 import Checkout from "../pages/checkoutlist/Checkout";
 import Login from "../pages/login/Login";
 import Register from "../pages/login/Register";
-import AdminRoute from "./AdminRoutes";
+import { PerminssionRoute } from "./AdminRoutes";
 import AdminDashboard from "../pages/admin/adminDashboard";
 import AdminOrders from "../pages/admin/adminOrder";
 import AdminProducts from "../pages/admin/adminProducts";
@@ -22,7 +22,7 @@ export default function AppRoutes() {
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/register" element={<Register />} />
 
-      <Route element={<AdminRoute />}>
+      <Route element={<PerminssionRoute requiredPermission="product.create" />}>
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/orders" element={<AdminOrders />} />
         <Route path="/admin/products" element={<AdminProducts />} />
