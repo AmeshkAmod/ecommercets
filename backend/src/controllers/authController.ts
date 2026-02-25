@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { registerUser, loginUser } from "../services/authService.js";
 import type { RegisterDTO, LoginDTO } from "../types/authTypes.js";
 
-export const register = async (req:Request, res:Response) => {
+export const register = async (req: Request, res: Response) => {
   try {
     const data = req.body as RegisterDTO;
 
@@ -21,18 +21,19 @@ export const register = async (req:Request, res:Response) => {
   }
 };
 
-export const login = async (req:Request, res:Response) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const data = req.body as LoginDTO;
 
     const { user, token } = await loginUser(data);
-    
+
     res.json({
       token,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.roles,
       },
     });
   } catch (err: any) {
