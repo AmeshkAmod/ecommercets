@@ -1,5 +1,4 @@
 import { Navigate, Outlet } from "react-router-dom";
-<<<<<<< Updated upstream
 import { useAppSelector } from "../store/hooks";
 import { PermissionKeys } from "../types/auth";
 
@@ -28,16 +27,5 @@ export function PerminssionRoute({ requiredPermission }: Props) {
     return <Navigate to="/" replace/>
   }
 
-=======
-
-export default function AdminRoute(){
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  if (!token || !user?.isAdmin) {
-    return <Navigate to="/login" replace />;
-  }
-
->>>>>>> Stashed changes
   return <Outlet />;
 }
