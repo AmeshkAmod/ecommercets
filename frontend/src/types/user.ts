@@ -4,7 +4,7 @@ export interface Role {
     permissions: string[];
 }
 
-interface AuthUser {
+export interface AuthUser {
     id: string;
     name: string;
     email: string;

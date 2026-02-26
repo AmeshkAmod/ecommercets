@@ -17,6 +17,9 @@ export default function AdminSidebar() {
         <Link to="/admin/products" className="hover:text-yellow-400">
           Products
         </Link>
+        <Link to="/" className="hover:text-yellow-400">
+          Home
+        </Link>
       </nav>
     </aside>
   );
