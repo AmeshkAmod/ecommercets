@@ -6,10 +6,11 @@ import Cart from "../pages/cartlist/cart";
 import Checkout from "../pages/checkoutlist/Checkout";
 import Login from "../pages/login/Login";
 import Register from "../pages/login/Register";
-import { PerminssionRoute } from "./AdminRoutes";
+import { PermissionRoute } from "./AdminRoutes";
 import AdminDashboard from "../pages/admin/adminDashboard";
 import AdminOrders from "../pages/admin/adminOrder";
 import AdminProducts from "../pages/admin/adminProducts";
+import { PermissionKeys } from "../types/auth";
 
 export default function AppRoutes() {
   return (
@@ -22,7 +23,7 @@ export default function AppRoutes() {
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/register" element={<Register />} />
 
-      <Route element={<PerminssionRoute requiredPermission="product.create" />}>
+      <Route element={<PermissionRoute requiredPermission={PermissionKeys.CREATE_PRODUCT} />}>
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/orders" element={<AdminOrders />} />
         <Route path="/admin/products" element={<AdminProducts />} />

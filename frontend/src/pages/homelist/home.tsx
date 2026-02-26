@@ -24,10 +24,6 @@ export default function Home() {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  if (user?.role === "admin") {
-    return <Navigate to="/admin" replace />;
-  }
-
   const filteredProducts = useMemo(() => {
     return products.filter((p) =>
       p.title.toLowerCase().includes(query)
