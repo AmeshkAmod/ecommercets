@@ -11,14 +11,14 @@ import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
-import { Request, Response } from "express";
+
 
 dotenv.config();
 
 const app = express();
 
 /* ---------- DB ---------- */
-connectDB();
+
 
 /* ---------- SEED ROLES ---------- */
 (async () => {
