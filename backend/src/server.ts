@@ -18,7 +18,6 @@ dotenv.config();
 const app = express();
 
 /* ---------- DB ---------- */
-connectDB();
 
 /* ---------- SEED ROLES ---------- */
 (async () => {
