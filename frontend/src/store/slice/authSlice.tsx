@@ -40,6 +40,44 @@ export const loginUser = createAsyncThunk<
   }
 );
 
+export const forgotPassword = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>(
+  "auth/forgotPassword",
+  async (email, { rejectWithValue }) => {
+    try {
+      const res = await API.post("/auth/forgot-password", { email });
+      return res.data.message;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to send reset link"
+      );
+    }
+  }
+);
+export const resetPassword = createAsyncThunk<
+  string,
+  { token: string; password: string },
+  { rejectValue: string }
+>(
+  "auth/resetPassword",
+  async ({ token, password }, { rejectWithValue }) => {
+    try {
+      const res = await API.post(
+        `/auth/reset-password/${token}`,
+        { password }
+      );
+      return res.data.message;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Password reset failed"
+      );
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,

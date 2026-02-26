@@ -4,34 +4,27 @@ import Role from "../models/role.js";
 
 export const roles = [
   {
-    name: "admin",
+    name: "ADMIN",
     permissions: [
-        "product.create",
-         "product.update",
-          "product.delete",
-           "user.manage"
-        ]
+      "product.create",
+      "product.update",
+      "product.delete",
+      "user.manage",
+    ],
   },
   {
-    name: "manager",
-    permissions: [
-        "product.create",
-         "product.update"
-        ]
+    name: "MANAGER",
+    permissions: ["product.create", "product.update"],
   },
   {
-    name: "customer",
-    permissions: ["product.read"]
-  }
+    name: "USER",
+    permissions: ["product.read"],
+  },
 ];
 
 export async function seedRoles() {
-    for (const role of roles) {
-    await Role.updateOne(
-        { name: role.name },
-        { $set: role },
-        { upsert: true }
-    );
-    }
-    console.log("Roles seeded successfully");
+  for (const role of roles) {
+    await Role.updateOne({ name: role.name }, { $set: role }, { upsert: true });
+  }
+  console.log("Roles seeded successfully");
 }
