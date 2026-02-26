@@ -11,12 +11,16 @@ import AdminDashboard from "../pages/admin/adminDashboard";
 import AdminOrders from "../pages/admin/adminOrder";
 import AdminProducts from "../pages/admin/adminProducts";
 import { PermissionKeys } from "../types/auth";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/reset-password/:token" element={<ResetPassword />} />
 
       <Route path="/product/:id" element={<Product />} />
       <Route path="/cart" element={<Cart />} />
