@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loginUser } from "../../store/slice/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { PermissionKeys } from "../../types/auth";
-import  { AuthUser } from "../../types/auth";
+import  { AuthUser } from "../../types/user";
 
 interface LoginForm {
   email: string;
