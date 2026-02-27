@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { resetPassword } from "../../store/slice/authSlice";
 
@@ -11,7 +11,7 @@ export default function ResetPassword() {
 
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!token) return;
 

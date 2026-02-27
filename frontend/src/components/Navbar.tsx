@@ -9,13 +9,9 @@ export default function Navbar() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { isAuthenticated } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const isAuthenticated = useSelector((state: RootState) => state.auth);
 
-  const cartItems = useSelector(
-    (state: RootState) => state.cart.items
-  );
+  const cartItems = useSelector((state: RootState) => state.cart.items);
 
   const [search, setSearch] = useState<string>("");
 
@@ -27,10 +23,7 @@ export default function Navbar() {
   }, [dispatch, isAuthenticated]);
 
   // 🔢 cart quantity
-  const totalQty = cartItems.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  const totalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   // 🔍 SEARCH HANDLER
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
@@ -44,7 +37,6 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-[#020617] border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
-
         <Link
           to="/"
           className="text-xl font-extrabold tracking-wide text-gray-100"
@@ -70,12 +62,8 @@ export default function Navbar() {
         </form>
 
         <nav className="flex items-center gap-5 text-sm text-gray-300">
-
           {isAuthenticated && (
-            <Link
-              to="/checkout"
-              className="hover:text-yellow-400 transition"
-            >
+            <Link to="/checkout" className="hover:text-yellow-400 transition">
               Quick Checkout
             </Link>
           )}
@@ -104,7 +92,6 @@ export default function Navbar() {
             className="relative border border-gray-700 px-4 py-1.5 rounded-full hover:border-yellow-400 transition"
           >
             🛒 Cart
-
             {totalQty > 0 && (
               <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded-full animate-bounce">
                 {totalQty}

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { forgotPassword } from "../../store/slice/authSlice";
 import { Link } from "react-router-dom";
@@ -9,7 +9,7 @@ export default function ForgotPassword() {
 
   const [email, setEmail] = useState("");
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     await dispatch(forgotPassword(email));
   };
