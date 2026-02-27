@@ -49,16 +49,21 @@ export const deleteProduct = createAsyncThunk<
 
 export const addProduct = createAsyncThunk<
   Product,
-  { title: string; price: number; countInStock: number }
+  FormData
 >(
   "adminProducts/add",
-  async ({ title, price, countInStock }) => {
-    const res = await API.post("/products", {
-      title,
-      price,
-      countInStock,
-    });
-    return res.data; // newly created product
+  async (formData) => {
+    const res = await API.post(
+      "/products",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return res.data;
   }
 );
 
