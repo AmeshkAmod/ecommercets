@@ -12,12 +12,12 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 
+
 dotenv.config();
 
 const app = express();
 
 /* ---------- DB ---------- */
-connectDB();
 
 /* ---------- SEED ROLES ---------- */
 (async () => {

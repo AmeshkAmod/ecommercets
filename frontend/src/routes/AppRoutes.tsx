@@ -6,23 +6,28 @@ import Cart from "../pages/cartlist/cart";
 import Checkout from "../pages/checkoutlist/Checkout";
 import Login from "../pages/login/Login";
 import Register from "../pages/login/Register";
-import { PerminssionRoute } from "./AdminRoutes";
+import { PermissionRoute } from "./AdminRoutes";
 import AdminDashboard from "../pages/admin/adminDashboard";
 import AdminOrders from "../pages/admin/adminOrder";
 import AdminProducts from "../pages/admin/adminProducts";
+import { PermissionKeys } from "../types/auth";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/reset-password/:token" element={<ResetPassword />} />
 
       <Route path="/product/:id" element={<Product />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/register" element={<Register />} />
 
-      <Route element={<PerminssionRoute requiredPermission="product.create" />}>
+      <Route element={<PermissionRoute requiredPermission={PermissionKeys.CREATE_PRODUCT} />}>
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/orders" element={<AdminOrders />} />
         <Route path="/admin/products" element={<AdminProducts />} />

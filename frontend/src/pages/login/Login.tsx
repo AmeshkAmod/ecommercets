@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loginUser } from "../../store/slice/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { PermissionKeys } from "../../types/auth";
-import  { AuthUser } from "../../types/auth";
+import { AuthUser } from "../../types/user";
 
 interface LoginForm {
   email: string;
@@ -30,9 +30,7 @@ export default function Login() {
     }));
   };
 
-  const handleSubmit = async (
-    e: FormEvent<HTMLFormElement>
-  ): Promise<void> => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
     try {
@@ -40,7 +38,7 @@ export default function Login() {
       const user = await dispatch(loginUser(form)).unwrap();
 
       const getpermissions = (user: AuthUser) =>
-      user.role.flatMap(r => r.permissions);
+        user.role.flatMap((r) => r.permissions);
 
       const permissions = getpermissions(user);
 
@@ -59,7 +57,6 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#020617] via-black to-[#020617] px-4">
       <div className="relative w-full max-w-sm rounded-3xl p-px bg-linear-to-br from-yellow-400/30 to-transparent">
         <div className="bg-[#020617]/90 backdrop-blur-xl rounded-3xl p-7 text-gray-200 shadow-2xl">
-
           {/* Logo */}
           <h1 className="text-3xl font-extrabold text-center tracking-wide mb-1">
             Dark<span className="text-yellow-400">.</span>Cart
@@ -70,7 +67,6 @@ export default function Login() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-
             {/* Email */}
             <div>
               <label className="text-xs text-gray-400 mb-1 block">
@@ -107,10 +103,16 @@ export default function Login() {
 
             {/* Error */}
             {error && (
-              <p className="text-red-400 text-xs text-center">
-                {error}
-              </p>
+              <p className="text-red-400 text-xs text-center">{error}</p>
             )}
+            <div className="text-right">
+              <Link
+                to="/forgot-password"
+                className="text-xs text-yellow-400 hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
 
             {/* Submit */}
             <button
@@ -134,7 +136,6 @@ export default function Login() {
               Create one
             </Link>
           </p>
-
         </div>
       </div>
     </div>
