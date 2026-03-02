@@ -1,14 +1,35 @@
+import { useEffect, useMemo } from "react";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchAdminStats } from "../../store/slice/adminStatsSlice";
 import AdminLayout from "./AdminLayout";
 
+
 export default function AdminDashboard() {
+  const dispatch = useAppDispatch()
+
+  const { stats,status } = useAppSelector((s) => s.adminStats);
+
+  useEffect(() => {
+    dispatch(fetchAdminStats());
+  }, [dispatch]);
+
   return (
     <AdminLayout>
       <h1 className="text-xl font-bold mb-6">Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Total Orders" value="—" />
-        <StatCard title="Total Revenue" value="—" />
-        <StatCard title="Products" value="—" />
+        <StatCard 
+          title="Total Orders" 
+          value={stats?.totalOrders?.toString() || "0"} 
+        />
+        <StatCard 
+          title="Total Revenue" 
+          value={`$ ${stats?.totalRevenue || 0}`} 
+        />
+        <StatCard 
+          title="Products" 
+          value={stats?.totalProducts?.toString() || "0"} 
+        />
       </div>
     </AdminLayout>
   );

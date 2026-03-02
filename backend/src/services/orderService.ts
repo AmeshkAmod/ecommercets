@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
-import Order from "../models/Order.js";
+import ProductModel from "../models/Product.js";
 import Cart from "../models/Cart.js";
+import OrderModel from "../models/Order.js";
 
 interface CreateOrderDTO {
   userId: Types.ObjectId;
@@ -22,7 +23,7 @@ export const createOrder = async ({
     throw new Error("No order items");
   }
 
-  const order = await Order.create({
+  const order = await OrderModel.create({
     user: userId,
     items,
     total,
@@ -46,10 +47,34 @@ export const listOrders = async (
   isAdmin: boolean,
 ) => {
   if (isAdmin) {
-    return Order.find().populate("user").lean();
+    return OrderModel.find().populate("user").lean();
   }
 
-  return Order.find({ user: userId })
+  return OrderModel.find({ user: userId })
     .populate("items.product")
     .lean();
+};
+
+export const getAdminStats = async () => {
+  
+  const totalOrders = await OrderModel.countDocuments();
+
+  const revenueData = await OrderModel.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: "$total" },
+      },
+    },
+  ]);
+
+  const totalRevenue = revenueData[0]?.totalRevenue || 0;
+
+  const totalProducts = await ProductModel.countDocuments();
+
+  return {
+    totalOrders,
+    totalRevenue,
+    totalProducts,
+  };
 };

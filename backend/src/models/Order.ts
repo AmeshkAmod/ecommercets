@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, type Model } from 'mongoose';
 import type { InferSchemaType, HydratedDocument } from 'mongoose'; 
 
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOrder, listOrders } from '../controllers/orderController.js';
+import { adminStats, createOrder, listOrders } from '../controllers/orderController.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -23,5 +23,6 @@ router.post('/', protect, createOrder);
  * - orders.html  → fetch('/api/orders')
  */
 router.get('/', protect, listOrders);
+router.get("/admin/stats", protect, adminStats);
 
 export default router;

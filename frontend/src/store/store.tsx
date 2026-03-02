@@ -7,6 +7,7 @@ import productReducer from "./slice/productSlice";
 import authReducer from "./slice/authSlice";
 import adminOrderReducer from "./slice/adminOrderSlice";
 import adminProductReducer from "./slice/adminProductSlice";
+import adminStatsReducer from "./slice/adminStatsSlice";
 
 import { attachAuthInterceptor } from "../api/api";
 
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   adminOrders: adminOrderReducer,
   adminProducts: adminProductReducer,
+  adminStats: adminStatsReducer,
 });
 
 /* ---------- ROOT STATE TYPE ---------- */
@@ -55,6 +57,5 @@ export const persistor = persistStore(store);
 /* ---------- AXIOS INTERCEPTOR ---------- */
 attachAuthInterceptor(() => {
   const state = store.getState();
-  return state.auth.user?.token ?? null;
+  return state.auth.token ?? null;
 });
-

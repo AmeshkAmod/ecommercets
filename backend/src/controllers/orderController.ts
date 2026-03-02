@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as orderService from "../services/orderService.js";
+import { getAdminStats } from "../services/orderService.js";
 
 /* =========================
    CREATE ORDER
@@ -48,3 +49,12 @@ export const listOrders = async (
     });
   }
 };
+
+export const adminStats = async (req: Request, res: Response) => {
+  try {
+    const stats = await getAdminStats();
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch stats" });
+  }
+}
