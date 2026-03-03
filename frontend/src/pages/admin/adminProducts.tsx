@@ -2,137 +2,245 @@ import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { Product } from "../../types/product";
 import AdminLayout from "./AdminLayout";
-import { 
+
+import {
   fetchProducts,
   deleteProduct,
   updateProduct,
   addProduct,
- } from "../../store/slice/adminProductSlice";
+} from "../../store/slice/adminProductSlice";
 
 export default function AdminProducts() {
   const dispatch = useAppDispatch();
-  const products = useAppSelector(s => s.adminProducts.products);
+  const products = useAppSelector(
+    (s) => s.adminProducts.products
+  );
 
-  const [title, setTitle] = useState<string>("");
-  const [newPrice, setNewPrice] = useState<string>("");
-  const [newStock, setNewStock] = useState<string>("");
+  /* ---------- ADD PRODUCT STATES ---------- */
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [newStock, setNewStock] = useState("");
 
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [price, setPrice] = useState<string>("");
-  const [stock, setStock] = useState<string>("");
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
+  /* ---------- EDIT STATES ---------- */
+  const [editingId, setEditingId] =
+    useState<string | null>(null);
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+  const [editDescription, setEditDescription] =
+    useState("");
 
+  const [editImage, setEditImage] =
+    useState<File | null>(null);
+  const [editPreview, setEditPreview] =
+    useState<string | null>(null);
+
+  /* ---------- FETCH PRODUCTS ---------- */
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-
-  const handleAddProduct = () => {
-    if (!title || !newPrice || !newStock) return;
-
-    dispatch(
-      addProduct({
-        title,
-        price: Number(newPrice),
-        countInStock: Number(newStock),
-      })
-    );
-
-    setTitle("");
-    setNewPrice("");
-    setNewStock("");
+  /* ---------- ADD IMAGE SELECT ---------- */
+  const handleImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
   };
 
+  /* ---------- ADD PRODUCT ---------- */
+  const handleAddProduct = () => {
+    if (!title || !description || !newPrice || !newStock) return;
+
+    const formData = new FormData();
+
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("price", newPrice);
+    formData.append("countInStock", newStock);
+
+    if (image) {
+      formData.append("image", image);
+    }
+
+    dispatch(addProduct(formData as any));
+
+    setTitle("");
+    setDescription("");
+    setNewPrice("");
+    setNewStock("");
+    setImage(null);
+    setPreview(null);
+  };
+
+  /* ---------- EDIT START ---------- */
   const startEdit = (product: Product) => {
     setEditingId(product._id);
     setPrice(String(product.price));
     setStock(String(product.countInStock));
-  };
+    setEditDescription(product.description || "");
 
-  const saveEdit = (id: string) => {
-    dispatch(
-      updateProduct({
-        id,
-        price: Number(price),
-        countInStock: Number(stock),
-      })
+    setEditPreview(
+      product.image
+        ? `http://localhost:5000/uploads/${product.image}`
+        : null
     );
-    setEditingId(null);
   };
 
+  /* ---------- SAVE EDIT ---------- */
+  const saveEdit = (id: string) => {
+    const formData = new FormData();
+
+    formData.append("price", price);
+    formData.append("countInStock", stock);
+    formData.append("description", editDescription);
+
+    if (editImage) {
+      formData.append("image", editImage);
+    }
+
+    dispatch(updateProduct({ id, formData } as any));
+
+    setEditingId(null);
+    setEditImage(null);
+    setEditPreview(null);
+  };
 
   return (
     <AdminLayout>
-      <h1 className="text-xl font-bold mb-6">Products</h1>
+      <h1 className="text-xl font-bold mb-6">
+        Products
+      </h1>
 
-        {/* add product form */}
-      <div className="mb-6 flex gap-4">
+      {/* ---------- ADD PRODUCT FORM ---------- */}
+      <div className="mb-6 flex gap-4 flex-wrap items-center">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Product title"
-          className="bg-black border border-gray-700 px-3 py-1" 
+          className="bg-black border border-gray-700 px-3 py-1"
+        />
+
+        <textarea
+  value={description}
+  onChange={(e) => setDescription(e.target.value)}
+  placeholder="Product description"
+  rows={1}
+  className="bg-black border border-gray-700 px-3 py-1 w-64 resize-none"
+/>
+
+        <input
+          type="number"
+          value={newPrice}
+          onChange={(e) =>
+            setNewPrice(e.target.value)
+          }
+          placeholder="Price"
+          className="bg-black border border-gray-700 px-3 py-1"
         />
 
         <input
-        type="number"
-        value={newPrice}
-        onChange={(e) => setNewPrice(e.target.value)}
-        placeholder="Price"
-        className="bg-black border border-gray-700 px-3 py-1"
+          type="number"
+          value={newStock}
+          onChange={(e) =>
+            setNewStock(e.target.value)
+          }
+          placeholder="Stock"
+          className="bg-black border border-gray-700 px-3 py-1"
         />
 
-        <input
-        type="number"
-        value={newStock}
-        onChange={(e) => setNewStock(e.target.value)}
-        placeholder="Stock"
-        className="bg-black border border-gray-700 px-3 py-1"
-        />
+        <label className="bg-yellow-500 px-4 py-1 rounded cursor-pointer">
+          Add Image
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleImageChange}
+          />
+        </label>
 
         <button
           onClick={handleAddProduct}
-          className="bg-green-600 px-4 py-1 rounded"  
+          className="bg-green-600 px-4 py-1 rounded"
         >
           Add Product
         </button>
       </div>
 
-      {/* product table */}
+      {preview && (
+        <img
+          src={preview}
+          alt="preview"
+          className="w-32 mb-6 rounded"
+        />
+      )}
+
+      {/* ---------- PRODUCT TABLE ---------- */}
       <table className="w-full text-sm border border-gray-800">
         <thead className="bg-black">
           <tr>
             <th className="p-3">Title</th>
+            <th>Description</th>
             <th>Price</th>
             <th>Stock</th>
-            <th></th>
+            <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {products.map((p) => (
-            <tr key={p._id} className="border-t border-gray-800">
+            <tr
+              key={p._id}
+              className="border-t border-gray-800"
+            >
               <td className="p-3">{p.title}</td>
-              {/* price */}
+
               <td>
                 {editingId === p._id ? (
-                  <input
-                   type="number"
-                   value={price}
-                   onChange={(e) => setPrice(e.target.value)}
-                   className="bg-black border border-gray-700 w-20 px-2" 
+                  <textarea
+                    value={editDescription}
+                    onChange={(e) =>
+                      setEditDescription(
+                        e.target.value
+                      )
+                    }
+                    className="bg-black border border-gray-700 px-2"
+                    rows={2}
                   />
                 ) : (
-                  `${p.price}`
+                  p.description
                 )}
               </td>
 
-              {/* stock */}
+              <td>
+                {editingId === p._id ? (
+                  <input
+                    type="number"
+                    value={price}
+                    onChange={(e) =>
+                      setPrice(e.target.value)
+                    }
+                    className="bg-black border border-gray-700 w-20 px-2"
+                  />
+                ) : (
+                  `₹${p.price}`
+                )}
+              </td>
+
               <td>
                 {editingId === p._id ? (
                   <input
                     type="number"
                     value={stock}
-                    onChange={(e) => setStock(e.target.value)}
+                    onChange={(e) =>
+                      setStock(e.target.value)
+                    }
                     className="bg-black border border-gray-700 w-16 px-2"
                   />
                 ) : (
@@ -140,31 +248,68 @@ export default function AdminProducts() {
                 )}
               </td>
 
-              {/* actions */}
-              <td className="flex gap-3">
+              <td className="flex flex-col gap-2">
                 {editingId === p._id ? (
-                  <button
-                  onClick={() => saveEdit(p._id)}
-                  className="text-green-400"
-                  >
-                    Save
-                  </button>
+                  <>
+                    <label className="bg-yellow-500 px-2 py-1 rounded cursor-pointer text-sm">
+                      Change Image
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file =
+                            e.target.files?.[0];
+                          if (file) {
+                            setEditImage(file);
+                            setEditPreview(
+                              URL.createObjectURL(file)
+                            );
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {editPreview && (
+                      <img
+                        src={editPreview}
+                        alt="preview"
+                        className="w-20 rounded"
+                      />
+                    )}
+
+                    <button
+                      onClick={() =>
+                        saveEdit(p._id)
+                      }
+                      className="text-green-400"
+                    >
+                      Save
+                    </button>
+                  </>
                 ) : (
-                  <button
-                    onClick={() => startEdit(p)}
-                    className="text-yellow-400"
-                  >
-                    Edit
-                  </button>
+                  <>
+                    <button
+                      onClick={() =>
+                        startEdit(p)
+                      }
+                      className="text-yellow-400"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        dispatch(
+                          deleteProduct(p._id)
+                        )
+                      }
+                      className="text-red-400"
+                    >
+                      Delete
+                    </button>
+                  </>
                 )}
-
-
-                <button
-                  onClick={() => dispatch(deleteProduct(p._id))}
-                  className="text-red-400"
-                >
-                  Delete
-                </button>
               </td>
             </tr>
           ))}
