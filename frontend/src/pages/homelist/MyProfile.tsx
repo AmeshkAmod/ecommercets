@@ -53,20 +53,20 @@ export default function Profile() {
   };
 
   return (
-    
-  <div className="min-h-screen bg-[#020617] text-white p-8">
-    
-    {/* Dark.Cart Emblem */}
-    <div className="max-w-3xl mx-auto mb-6">
-      <Link
-        to="/"
-        className="text-2xl font-extrabold tracking-wide text-gray-100 hover:opacity-80 transition"
-      >
-        Dark<span className="text-yellow-400">.</span>Cart
-      </Link>
-    </div>
+ <div className="min-h-screen bg-[#020617] text-white p-8 relative">
 
-    <div className="max-w-3xl mx-auto bg-black border border-gray-800 p-8 rounded-xl">
+  {/* Logo Top Left */}
+  <div className="absolute top-6 left-8">
+    <Link
+      to="/"
+      className="text-2xl font-extrabold tracking-wide hover:opacity-80 transition"
+    >
+      Dark<span className="text-yellow-400">.</span>Cart
+    </Link>
+  </div>
+
+  {/* Profile Card */}
+  <div className="max-w-3xl mx-auto mt-16 bg-black border border-gray-800 p-8 rounded-xl">
    
         <h2 className="text-2xl font-bold mb-6">My Profile</h2>
 
