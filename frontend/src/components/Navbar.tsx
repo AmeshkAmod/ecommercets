@@ -106,21 +106,25 @@ export default function Navbar() {
 
               {/* Dropdown */}
               {open && (
-                <div className="absolute right-0 mt-3 w-60 bg-white text-black rounded-xl shadow-xl overflow-hidden">
-                  <div className="p-4 border-b bg-gray-50">
+                <div
+                  className="absolute right-0 mt-3 w-60 
+  bg-[#0f172a] border border-gray-800 
+  text-gray-200 rounded-xl shadow-2xl overflow-hidden"
+                >
+                  <div className="p-4 border-b border-gray-800 bg-[#020617]">
                     <p className="font-semibold">{user?.name}</p>
                   </div>
 
                   <Link
                     to="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100 transition"
+                    className="block px-4 py-2 hover:bg-gray-800 hover:text-yellow-400 transition"
                     onClick={() => setOpen(false)}
                   >
                     My Profile
                   </Link>
                   <Link
                     to="/my-orders"
-                    className="block px-4 py-2 hover:bg-gray-100 transition"
+                    className="block px-4 py-2 hover:bg-gray-800 hover:text-yellow-400 transition"
                     onClick={() => setOpen(false)}
                   >
                     My Orders
@@ -131,7 +135,7 @@ export default function Navbar() {
                       dispatch(logout());
                       navigate("/login");
                     }}
-                    className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 transition"
+                    className="w-full text-left px-4 py-2 hover:bg-red-900/40 text-red-400 transition"
                   >
                     Logout
                   </button>
