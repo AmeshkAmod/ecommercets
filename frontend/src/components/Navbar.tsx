@@ -97,10 +97,6 @@ export default function Navbar() {
                 <div className="absolute right-0 mt-3 w-60 bg-white text-black rounded-xl shadow-xl overflow-hidden">
                   <div className="p-4 border-b bg-gray-50">
                     <p className="font-semibold">{user?.name}</p>
-                    <p className="text-sm text-gray-600">{user?.email}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {user?.role?.join(", ")}
-                    </p>
                   </div>
 
                   <Link
@@ -109,6 +105,13 @@ export default function Navbar() {
                     onClick={() => setOpen(false)}
                   >
                     My Profile
+                  </Link>
+                  <Link
+                    to="/my-orders"
+                    className="block px-4 py-2 hover:bg-gray-100 transition"
+                    onClick={() => setOpen(false)}
+                  >
+                    My Orders
                   </Link>
 
                   <button
