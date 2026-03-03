@@ -128,13 +128,12 @@ export default function AdminProducts() {
         />
 
         <textarea
-          value={description}
-          onChange={(e) =>
-            setDescription(e.target.value)
-          }
-          placeholder="Product description"
-          className="bg-black border border-gray-700 px-3 py-1"
-        />
+  value={description}
+  onChange={(e) => setDescription(e.target.value)}
+  placeholder="Product description"
+  rows={1}
+  className="bg-black border border-gray-700 px-3 py-1 w-64 resize-none"
+/>
 
         <input
           type="number"
