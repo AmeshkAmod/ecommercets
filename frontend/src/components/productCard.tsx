@@ -13,8 +13,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { token } = useSelector((state: RootState) => state.auth);
-const isAuthenticated=!!token
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
   const cartStatus = useSelector((state: RootState) => state.cart.status);
 
   const [added, setAdded] = useState<boolean>(false);
@@ -50,7 +50,7 @@ const isAuthenticated=!!token
     <div className="bg-black border border-gray-800 rounded-xl p-4 text-gray-200 flex flex-col hover:border-yellow-400 transition">
       <Link to={`/product/${product._id}`}>
         <img
-          src={product.image}
+           src={`http://localhost:5000/uploads/${product.image}`}
           alt={product.title}
           className="h-40 w-full object-contain mb-3 hover:scale-105 transition-transform"
         />

@@ -24,10 +24,12 @@ export const listProducts = async (req: Request, res: Response) => {
 ========================= */
 export const getProduct = async (
   req: Request<{ id: string }>,
-  res: Response,
+  res: Response
 ) => {
   try {
-    const product = await productService.getProductById(req.params.id);
+    const product = await productService.getProductById(
+      req.params.id
+    );
 
     res.json(product);
   } catch (error: any) {
@@ -36,11 +38,19 @@ export const getProduct = async (
 };
 
 /* =========================
-   CREATE PRODUCT
+   CREATE PRODUCT (✅ IMAGE SUPPORT)
 ========================= */
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const product = await productService.createProduct(req.body);
+    const image = req.file?.filename; // ⭐ multer image
+
+    const product = await productService.createProduct({
+      ...req.body,
+      image,
+    });
 
     res.status(201).json(product);
   } catch (error) {
@@ -52,14 +62,22 @@ export const createProduct = async (req: Request, res: Response) => {
 };
 
 /* =========================
-   UPDATE PRODUCT
+   UPDATE PRODUCT (✅ IMAGE UPDATE)
 ========================= */
 export const updateProduct = async (
   req: Request<{ id: string }>,
-  res: Response,
+  res: Response
 ) => {
   try {
-    const product = await productService.updateProduct(req.params.id, req.body);
+    const image = req.file?.filename;
+
+    const product = await productService.updateProduct(
+      req.params.id,
+      {
+        ...req.body,
+        ...(image && { image }),
+      }
+    );
 
     res.json(product);
   } catch (error: any) {
@@ -72,7 +90,7 @@ export const updateProduct = async (
 ========================= */
 export const deleteProduct = async (
   req: Request<{ id: string }>,
-  res: Response,
+  res: Response
 ) => {
   try {
     await productService.deleteProduct(req.params.id);
@@ -91,28 +109,32 @@ export const deleteProduct = async (
 ========================= */
 export const addProductReview = async (
   req: Request<{ id: string }>,
-  res: Response,
+  res: Response
 ) => {
   try {
     const productId = req.params.id;
     const { rating, comment } = req.body;
 
     const userId = req.user!._id;
-    const userName = req.user!.name ?? req.user!.email;
+    const userName =
+      req.user!.name ?? req.user!.email;
 
-    const product = await productService.addProductReview(
-      productId,
-      userId,
-      userName,
-      Number(rating),
-      comment,
-    );
+    const product =
+      await productService.addProductReview(
+        productId,
+        userId,
+        userName,
+        Number(rating),
+        comment
+      );
 
     res.status(201).json({
       message: "Review added",
       product,
     });
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({
+      message: error.message,
+    });
   }
 };
