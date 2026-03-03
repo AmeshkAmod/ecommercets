@@ -13,7 +13,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { token } = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = !!token
 
   const cartStatus = useSelector((state: RootState) => state.cart.status);
 

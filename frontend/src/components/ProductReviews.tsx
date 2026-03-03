@@ -13,9 +13,10 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { isAuthenticated } = useSelector(
+  const { token} = useSelector(
     (state: RootState) => state.auth
   );
+  const isAuthenticated = !!token
 
   const [rating, setRating] = useState<number | "">("");
   const [comment, setComment] = useState<string>("");
