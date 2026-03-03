@@ -2,7 +2,8 @@ import { useState, useEffect, FormEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../store/store";
 import { updateProfile } from "../../store/slice/authSlice";
-
+import { fetchCurrentUser } from "../../store/slice/authSlice";
+import {Link} from "react-router-dom"
 export default function Profile() {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -18,18 +19,20 @@ export default function Profile() {
   const [country, setCountry] = useState("");
 
   useEffect(() => {
-    if (user) {
-      setName(user.name || "");
-      setEmail(user.email || "");
-      setPhone(user.phone || "");
-      setStreet(user.address?.street || "");
-      setCity(user.address?.city || "");
-      setStateField(user.address?.state || "");
-      setPostalCode(user.address?.postalCode || "");
-      setCountry(user.address?.country || "");
-    }
-  }, [user]);
-
+    if (!user) return;
+  if (!user.phone || !user.address) {
+    dispatch(fetchCurrentUser());
+  } else {
+    setName(user.name || "");
+    setEmail(user.email || "");
+    setPhone(user.phone || "");
+    setStreet(user.address?.street || "");
+    setCity(user.address?.city || "");
+    setStateField(user.address?.state || "");
+    setPostalCode(user.address?.postalCode || "");
+    setCountry(user.address?.country || "");
+  }
+}, [user, dispatch]);
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
@@ -50,8 +53,21 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white p-8">
-      <div className="max-w-3xl mx-auto bg-black border border-gray-800 p-8 rounded-xl">
+    
+  <div className="min-h-screen bg-[#020617] text-white p-8">
+    
+    {/* Dark.Cart Emblem */}
+    <div className="max-w-3xl mx-auto mb-6">
+      <Link
+        to="/"
+        className="text-2xl font-extrabold tracking-wide text-gray-100 hover:opacity-80 transition"
+      >
+        Dark<span className="text-yellow-400">.</span>Cart
+      </Link>
+    </div>
+
+    <div className="max-w-3xl mx-auto bg-black border border-gray-800 p-8 rounded-xl">
+   
         <h2 className="text-2xl font-bold mb-6">My Profile</h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">

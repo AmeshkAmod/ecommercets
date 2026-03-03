@@ -63,11 +63,23 @@ export const resetPassword = createAsyncThunk<
     );
   }
 });
+export const fetchCurrentUser = createAsyncThunk<
+  AuthUser,
+  void,
+  { rejectValue: string }
+>("auth/fetchCurrentUser", async (_, { rejectWithValue }) => {
+  try {
+    const res = await API.get("/users/me");
+    return res.data;
+  } catch (error: any) {
+    return rejectWithValue("Failed to fetch user");
+  }
+});
 export const updateProfile = createAsyncThunk<
   AuthUser,
   {
     name: string;
-    
+
     phone: string;
     address: {
       street: string;
@@ -119,6 +131,9 @@ const authSlice = createSlice({
         state.status = "failed";
         state.error = action.payload ?? "Login failed";
       })
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+  state.user = action.payload;
+})
       .addCase(updateProfile.pending, (state) => {
         state.status = "loading";
       })
