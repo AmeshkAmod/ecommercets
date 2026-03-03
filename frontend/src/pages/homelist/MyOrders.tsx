@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../../api/api";
+import { Link } from "react-router-dom";
+
 export default function MyOrders() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,8 +30,20 @@ export default function MyOrders() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white p-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-[#020617] text-white p-8 relative">
+
+      {/* Logo Top Left */}
+      <div className="absolute top-6 left-8">
+        <Link
+          to="/"
+          className="text-2xl font-extrabold tracking-wide hover:opacity-80 transition"
+        >
+          Dark<span className="text-yellow-400">.</span>Cart
+        </Link>
+      </div>
+
+      {/* Page Content */}
+      <div className="max-w-3xl mx-auto mt-16">
         <h2 className="text-2xl font-bold mb-6">My Orders</h2>
 
         {orders.length === 0 ? (
@@ -43,7 +57,9 @@ export default function MyOrders() {
               >
                 <div className="flex justify-between text-sm text-gray-400">
                   <span>Order ID: {order._id}</span>
-                  <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+                  <span>
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
 
                 <div className="mt-3">
@@ -57,6 +73,7 @@ export default function MyOrders() {
           </div>
         )}
       </div>
+
     </div>
   );
 }
