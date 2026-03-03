@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import * as productService from "../services/productService.js";
+import { CreateProductDTO } from "../types/productTypes.js";
+
 
 /* =========================
    LIST PRODUCTS
@@ -41,7 +43,7 @@ export const getProduct = async (
    CREATE PRODUCT (✅ IMAGE SUPPORT)
 ========================= */
 export const createProduct = async (
-  req: Request,
+  req: Request<{ id: string }, {}, CreateProductDTO>,
   res: Response
 ) => {
   try {
