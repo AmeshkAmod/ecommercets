@@ -1,29 +1,36 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useEffect, useState, type FormEvent } from "react";
 import { logout } from "../store/slice/authSlice";
 import { fetchCart } from "../store/slice/cartSlice";
 import type { RootState, AppDispatch } from "../store/store";
-
+import { Role } from "../types/user";
 export default function Navbar() {
-  const dispatch = useDispatch<AppDispatch>();
+ const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const isAuthenticated = useSelector((state: RootState) => state.auth);
+  // ✅ FIXED: Get user properly
+  const user = useAppSelector((state: RootState) => state.auth.user);
+  const isAuthenticated = !!user;
 
-  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const cartItems = useAppSelector(
+    (state: RootState) => state.cart.items
+  );
 
   const [search, setSearch] = useState<string>("");
 
-  // 🔥 fetch cart on load / refresh
+  // ✅ fetch cart only if logged in
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       dispatch(fetchCart());
     }
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, user]);
 
   // 🔢 cart quantity
-  const totalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalQty = cartItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
   // 🔍 SEARCH HANDLER
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
@@ -34,9 +41,28 @@ export default function Navbar() {
     setSearch("");
   };
 
+  // ✅ ADMIN CHECK
+const isAdmin =
+  user?.role?.some((r) => r.name === "ADMIN") ?? false;
+
   return (
     <header className="sticky top-0 z-50 bg-[#020617] border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
+
+        {/* ✅ Admin Button Only for Admin */}
+        {isAdmin && (
+          <button
+            onClick={() => navigate("/admin")}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg 
+                       bg-gradient-to-r from-indigo-500 to-purple-600 
+                       text-white text-sm font-semibold 
+                       hover:from-indigo-600 hover:to-purple-700 
+                       transition-all duration-300 shadow-md"
+          >
+            Admin Panel
+          </button>
+        )}
+
         <Link
           to="/"
           className="text-xl font-extrabold tracking-wide text-gray-100"
@@ -63,7 +89,10 @@ export default function Navbar() {
 
         <nav className="flex items-center gap-5 text-sm text-gray-300">
           {isAuthenticated && (
-            <Link to="/checkout" className="hover:text-yellow-400 transition">
+            <Link
+              to="/checkout"
+              className="hover:text-yellow-400 transition"
+            >
               Quick Checkout
             </Link>
           )}
