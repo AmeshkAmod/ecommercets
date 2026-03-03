@@ -4,10 +4,21 @@ export interface Role {
   permissions: string[];
 }
 
+export interface Address {
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}
+
 export interface AuthUser {
-  id: string;
+  _id: string;       // match backend
   name: string;
   email: string;
-  token: string;
-  role: Role[];
+  token:string;
+  phone?: string;
+  role: Role[];     // plural (match backend)
+  address?: Address;
+
 }

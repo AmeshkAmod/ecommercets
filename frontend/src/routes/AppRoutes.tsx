@@ -13,7 +13,8 @@ import AdminProducts from "../pages/admin/adminProducts";
 import { PermissionKeys } from "../types/auth";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
-
+import MyOrders from "../pages/homelist/MyOrders";
+import Profile from "../pages/homelist/MyProfile";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -26,7 +27,8 @@ export default function AppRoutes() {
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/register" element={<Register />} />
-
+      <Route path="/my-orders" element={<MyOrders />} />
+      <Route path="/profile" element={<Profile />} />
       <Route element={<PermissionRoute requiredPermission={PermissionKeys.CREATE_PRODUCT} />}>
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/orders" element={<AdminOrders />} />
