@@ -18,6 +18,7 @@ export default function AdminProducts() {
 
   /* ---------- ADD PRODUCT STATES ---------- */
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [newStock, setNewStock] = useState("");
 
@@ -29,6 +30,8 @@ export default function AdminProducts() {
     useState<string | null>(null);
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [editDescription, setEditDescription] =
+    useState("");
 
   const [editImage, setEditImage] =
     useState<File | null>(null);
@@ -45,7 +48,6 @@ export default function AdminProducts() {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
-
     if (file) {
       setImage(file);
       setPreview(URL.createObjectURL(file));
@@ -54,11 +56,12 @@ export default function AdminProducts() {
 
   /* ---------- ADD PRODUCT ---------- */
   const handleAddProduct = () => {
-    if (!title || !newPrice || !newStock) return;
+    if (!title || !description || !newPrice || !newStock) return;
 
     const formData = new FormData();
 
     formData.append("title", title);
+    formData.append("description", description);
     formData.append("price", newPrice);
     formData.append("countInStock", newStock);
 
@@ -69,6 +72,7 @@ export default function AdminProducts() {
     dispatch(addProduct(formData as any));
 
     setTitle("");
+    setDescription("");
     setNewPrice("");
     setNewStock("");
     setImage(null);
@@ -80,6 +84,7 @@ export default function AdminProducts() {
     setEditingId(product._id);
     setPrice(String(product.price));
     setStock(String(product.countInStock));
+    setEditDescription(product.description || "");
 
     setEditPreview(
       product.image
@@ -94,6 +99,7 @@ export default function AdminProducts() {
 
     formData.append("price", price);
     formData.append("countInStock", stock);
+    formData.append("description", editDescription);
 
     if (editImage) {
       formData.append("image", editImage);
@@ -116,10 +122,17 @@ export default function AdminProducts() {
       <div className="mb-6 flex gap-4 flex-wrap items-center">
         <input
           value={title}
-          onChange={(e) =>
-            setTitle(e.target.value)
-          }
+          onChange={(e) => setTitle(e.target.value)}
           placeholder="Product title"
+          className="bg-black border border-gray-700 px-3 py-1"
+        />
+
+        <textarea
+          value={description}
+          onChange={(e) =>
+            setDescription(e.target.value)
+          }
+          placeholder="Product description"
           className="bg-black border border-gray-700 px-3 py-1"
         />
 
@@ -174,6 +187,7 @@ export default function AdminProducts() {
         <thead className="bg-black">
           <tr>
             <th className="p-3">Title</th>
+            <th>Description</th>
             <th>Price</th>
             <th>Stock</th>
             <th>Actions</th>
@@ -188,7 +202,23 @@ export default function AdminProducts() {
             >
               <td className="p-3">{p.title}</td>
 
-              {/* PRICE */}
+              <td>
+                {editingId === p._id ? (
+                  <textarea
+                    value={editDescription}
+                    onChange={(e) =>
+                      setEditDescription(
+                        e.target.value
+                      )
+                    }
+                    className="bg-black border border-gray-700 px-2"
+                    rows={2}
+                  />
+                ) : (
+                  p.description
+                )}
+              </td>
+
               <td>
                 {editingId === p._id ? (
                   <input
@@ -204,7 +234,6 @@ export default function AdminProducts() {
                 )}
               </td>
 
-              {/* STOCK */}
               <td>
                 {editingId === p._id ? (
                   <input
@@ -220,7 +249,6 @@ export default function AdminProducts() {
                 )}
               </td>
 
-              {/* ACTIONS */}
               <td className="flex flex-col gap-2">
                 {editingId === p._id ? (
                   <>
