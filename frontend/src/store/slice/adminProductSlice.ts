@@ -24,18 +24,23 @@ export const fetchProducts = createAsyncThunk<Product[]>(
 
 export const updateProduct = createAsyncThunk<
   Product,
-  { id: string; price: number; countInStock: number }
+  { id: string; formData: FormData }
 >(
   "adminProducts/update",
-  async ({ id, price, countInStock }) => {
-    const res = await API.put(`/products/${id}`, {
-      price,
-      countInStock,
-    });
-    return res.data; //updated product
+  async ({ id, formData }) => {
+    const res = await API.put(
+      `/products/${id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return res.data;
   }
 );
-
 export const deleteProduct = createAsyncThunk<
   string,
   string

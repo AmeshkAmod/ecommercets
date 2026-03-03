@@ -6,14 +6,14 @@ import {
   updateProduct,
   deleteProduct,
   addProductReview,
-} from "../controllers/productController.ts";
+} from "../controllers/productController.js";
 
 import { protect } from "../middleware/auth.js";
 import { requirePermissions } from "../middleware/rbac.js";
 import { PermissionKeys } from "../types/rbacTypes.js";
 
 /* ✅ IMPORT UPLOAD MIDDLEWARE */
-import upload from "../middleware/upload.ts";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 

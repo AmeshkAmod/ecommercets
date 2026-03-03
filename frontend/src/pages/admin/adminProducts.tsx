@@ -30,12 +30,17 @@ export default function AdminProducts() {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
 
+  const [editImage, setEditImage] =
+    useState<File | null>(null);
+  const [editPreview, setEditPreview] =
+    useState<string | null>(null);
+
   /* ---------- FETCH PRODUCTS ---------- */
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  /* ---------- IMAGE SELECT ---------- */
+  /* ---------- ADD IMAGE SELECT ---------- */
   const handleImageChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -70,23 +75,35 @@ export default function AdminProducts() {
     setPreview(null);
   };
 
-  /* ---------- EDIT PRODUCT ---------- */
+  /* ---------- EDIT START ---------- */
   const startEdit = (product: Product) => {
     setEditingId(product._id);
     setPrice(String(product.price));
     setStock(String(product.countInStock));
+
+    setEditPreview(
+      product.image
+        ? `http://localhost:5000/uploads/${product.image}`
+        : null
+    );
   };
 
+  /* ---------- SAVE EDIT ---------- */
   const saveEdit = (id: string) => {
-    dispatch(
-      updateProduct({
-        id,
-        price: Number(price),
-        countInStock: Number(stock),
-      })
-    );
+    const formData = new FormData();
+
+    formData.append("price", price);
+    formData.append("countInStock", stock);
+
+    if (editImage) {
+      formData.append("image", editImage);
+    }
+
+    dispatch(updateProduct({ id, formData } as any));
 
     setEditingId(null);
+    setEditImage(null);
+    setEditPreview(null);
   };
 
   return (
@@ -126,7 +143,6 @@ export default function AdminProducts() {
           className="bg-black border border-gray-700 px-3 py-1"
         />
 
-        {/* IMAGE PICKER */}
         <label className="bg-yellow-500 px-4 py-1 rounded cursor-pointer">
           Add Image
           <input
@@ -145,7 +161,6 @@ export default function AdminProducts() {
         </button>
       </div>
 
-      {/* IMAGE PREVIEW */}
       {preview && (
         <img
           src={preview}
@@ -171,9 +186,7 @@ export default function AdminProducts() {
               key={p._id}
               className="border-t border-gray-800"
             >
-              <td className="p-3">
-                {p.title}
-              </td>
+              <td className="p-3">{p.title}</td>
 
               {/* PRICE */}
               <td>
@@ -208,35 +221,68 @@ export default function AdminProducts() {
               </td>
 
               {/* ACTIONS */}
-              <td className="flex gap-3">
+              <td className="flex flex-col gap-2">
                 {editingId === p._id ? (
-                  <button
-                    onClick={() =>
-                      saveEdit(p._id)
-                    }
-                    className="text-green-400"
-                  >
-                    Save
-                  </button>
-                ) : (
-                  <button
-                    onClick={() =>
-                      startEdit(p)
-                    }
-                    className="text-yellow-400"
-                  >
-                    Edit
-                  </button>
-                )}
+                  <>
+                    <label className="bg-yellow-500 px-2 py-1 rounded cursor-pointer text-sm">
+                      Change Image
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file =
+                            e.target.files?.[0];
+                          if (file) {
+                            setEditImage(file);
+                            setEditPreview(
+                              URL.createObjectURL(file)
+                            );
+                          }
+                        }}
+                      />
+                    </label>
 
-                <button
-                  onClick={() =>
-                    dispatch(deleteProduct(p._id))
-                  }
-                  className="text-red-400"
-                >
-                  Delete
-                </button>
+                    {editPreview && (
+                      <img
+                        src={editPreview}
+                        alt="preview"
+                        className="w-20 rounded"
+                      />
+                    )}
+
+                    <button
+                      onClick={() =>
+                        saveEdit(p._id)
+                      }
+                      className="text-green-400"
+                    >
+                      Save
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() =>
+                        startEdit(p)
+                      }
+                      className="text-yellow-400"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        dispatch(
+                          deleteProduct(p._id)
+                        )
+                      }
+                      className="text-red-400"
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
               </td>
             </tr>
           ))}
