@@ -54,7 +54,7 @@ export type Order = InferSchemaType<typeof orderSchema>;
 //mongoose doc type
 export type OrderDocument = HydratedDocument<Order>
 
-const OrderModel = 
-    mongoose.models.Order || mongoose.model("Order", orderSchema);
+const OrderModel: Model<Order> = 
+    mongoose.models.Order || mongoose.model<Order>("Order", orderSchema);
     
 export default OrderModel;
