@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import ProductModel from "../models/Product.js";
 import Cart from "../models/Cart.js";
 import OrderModel from "../models/Order.js";
+import UserModel from "../models/User.js";
 
 interface CreateOrderDTO {
   userId: Types.ObjectId;
@@ -47,11 +48,15 @@ export const listOrders = async (
   isAdmin: boolean,
 ) => {
   if (isAdmin) {
-    return OrderModel.find().populate("user").lean();
+    return OrderModel.find()
+      .populate("user","name email address phone")
+      .populate("items.product", "title price image")
+      .sort({ createdAt: -1 })
+      .lean();
   }
 
   return OrderModel.find({ user: userId })
-    .populate("items.product")
+    .populate("items.product", "title price image")
     .lean();
 };
 
