@@ -3,6 +3,16 @@ import type { InferSchemaType, HydratedDocument } from "mongoose";
 import { NextFunction } from "express";
 import bcrypt from "bcrypt";
 
+const addressSchema = new Schema(
+  {
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    postalCode: { type: String },
+    country: { type: String },
+  },
+  { _id: false } // prevents separate _id for address
+);
 
 const userSchema = new Schema(
   {
@@ -21,6 +31,13 @@ const userSchema = new Schema(
       type: String, 
       required: true 
     },
+
+    phone:{
+      type:String,
+      match: [/^\+?[0-9]{7,15}$/, "Invalid phone number"],
+    },
+
+    address: addressSchema,
 
     resetPasswordToken: {
       type: String,

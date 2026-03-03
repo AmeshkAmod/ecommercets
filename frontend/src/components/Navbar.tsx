@@ -1,36 +1,31 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState, type FormEvent } from "react";
 import { logout } from "../store/slice/authSlice";
 import { fetchCart } from "../store/slice/cartSlice";
 import type { RootState, AppDispatch } from "../store/store";
-import { Role } from "../types/user";
+
 export default function Navbar() {
- const dispatch = useAppDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  // ✅ FIXED: Get user properly
-  const user = useAppSelector((state: RootState) => state.auth.user);
-  const isAuthenticated = !!user;
+  const { user, token } = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = !!token;
 
-  const cartItems = useAppSelector(
-    (state: RootState) => state.cart.items
-  );
+  const cartItems = useSelector((state: RootState) => state.cart.items);
 
   const [search, setSearch] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
 
-  // ✅ fetch cart only if logged in
+  // 🔥 fetch cart on login / refresh
   useEffect(() => {
-    if (user) {
+    if (isAuthenticated) {
       dispatch(fetchCart());
     }
-  }, [dispatch, user]);
+  }, [dispatch, isAuthenticated]);
 
   // 🔢 cart quantity
-  const totalQty = cartItems.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  const totalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   // 🔍 SEARCH HANDLER
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
@@ -41,28 +36,10 @@ export default function Navbar() {
     setSearch("");
   };
 
-  // ✅ ADMIN CHECK
-const isAdmin =
-  user?.role?.some((r) => r.name === "ADMIN") ?? false;
-
   return (
     <header className="sticky top-0 z-50 bg-[#020617] border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
-
-        {/* ✅ Admin Button Only for Admin */}
-        {isAdmin && (
-          <button
-            onClick={() => navigate("/admin")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg 
-                       bg-gradient-to-r from-indigo-500 to-purple-600 
-                       text-white text-sm font-semibold 
-                       hover:from-indigo-600 hover:to-purple-700 
-                       transition-all duration-300 shadow-md"
-          >
-            Admin Panel
-          </button>
-        )}
-
+        {/* Logo */}
         <Link
           to="/"
           className="text-xl font-extrabold tracking-wide text-gray-100"
@@ -70,6 +47,7 @@ const isAdmin =
           Dark<span className="text-yellow-400">.</span>Cart
         </Link>
 
+        {/* Search */}
         <form onSubmit={handleSearch} className="flex-1 relative">
           <input
             type="text"
@@ -87,16 +65,16 @@ const isAdmin =
           </button>
         </form>
 
+        {/* Right Side Nav */}
         <nav className="flex items-center gap-5 text-sm text-gray-300">
+          {/* Quick Checkout */}
           {isAuthenticated && (
-            <Link
-              to="/checkout"
-              className="hover:text-yellow-400 transition"
-            >
+            <Link to="/checkout" className="hover:text-yellow-400 transition">
               Quick Checkout
             </Link>
           )}
 
+          {/* User Section */}
           {!isAuthenticated ? (
             <Link
               to="/login"
@@ -105,17 +83,52 @@ const isAdmin =
               Login
             </Link>
           ) : (
-            <button
-              onClick={() => {
-                dispatch(logout());
-                navigate("/login");
-              }}
-              className="border border-red-400 text-red-400 px-4 py-1.5 rounded-full hover:bg-red-400 hover:text-black transition"
-            >
-              Logout
-            </button>
+            <div className="relative">
+              {/* Avatar */}
+              <button
+                onClick={() => setOpen(!open)}
+                className="w-9 h-9 rounded-full bg-yellow-400 text-black font-bold flex items-center justify-center hover:scale-105 transition"
+              >
+                {user?.name?.charAt(0).toUpperCase()}
+              </button>
+
+              {/* Dropdown */}
+              {open && (
+                <div className="absolute right-0 mt-3 w-60 bg-white text-black rounded-xl shadow-xl overflow-hidden">
+                  <div className="p-4 border-b bg-gray-50">
+                    <p className="font-semibold">{user?.name}</p>
+                  </div>
+
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 hover:bg-gray-100 transition"
+                    onClick={() => setOpen(false)}
+                  >
+                    My Profile
+                  </Link>
+                  <Link
+                    to="/my-orders"
+                    className="block px-4 py-2 hover:bg-gray-100 transition"
+                    onClick={() => setOpen(false)}
+                  >
+                    My Orders
+                  </Link>
+
+                  <button
+                    onClick={() => {
+                      dispatch(logout());
+                      navigate("/login");
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 transition"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
+          {/* Cart */}
           <Link
             to="/cart"
             className="relative border border-gray-700 px-4 py-1.5 rounded-full hover:border-yellow-400 transition"
