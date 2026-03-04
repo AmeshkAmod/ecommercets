@@ -35,6 +35,7 @@ export default function AdminOrders() {
               <td>{o.items
                 .map((item: any) => item.product?.title)
                 .join(",")}
+                .join(" ,  ")}
               </td>
               <td>{o.user?.email || "N/A"}</td>
               <td>₹{o.total}</td>
