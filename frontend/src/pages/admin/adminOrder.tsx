@@ -34,7 +34,6 @@ export default function AdminOrders() {
               <td className="p-3">{o._id?.slice(-6)}</td>
               <td>{o.items
                 .map((item: any) => item.product?.title)
-                .join(",")}
                 .join(" ,  ")}
               </td>
               <td>{o.user?.email || "N/A"}</td>
