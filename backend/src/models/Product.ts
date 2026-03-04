@@ -57,7 +57,11 @@ const productSchema = new Schema(
 
     description: String,
     category: String,
-    image: String,
+   
+    images: {
+  type: [String],
+  default: []
+},
 
     countInStock: {
       type: Number,

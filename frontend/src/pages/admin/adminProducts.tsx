@@ -12,9 +12,7 @@ import {
 
 export default function AdminProducts() {
   const dispatch = useAppDispatch();
-  const products = useAppSelector(
-    (s) => s.adminProducts.products
-  );
+  const products = useAppSelector((s) => s.adminProducts.products);
 
   /* ---------- ADD PRODUCT STATES ---------- */
   const [title, setTitle] = useState("");
@@ -22,62 +20,46 @@ export default function AdminProducts() {
   const [newPrice, setNewPrice] = useState("");
   const [newStock, setNewStock] = useState("");
 
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [images, setImages] = useState<FileList | null>(null);
 
   /* ---------- EDIT STATES ---------- */
-  const [editingId, setEditingId] =
-    useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
-  const [editDescription, setEditDescription] =
-    useState("");
+  const [editDescription, setEditDescription] = useState("");
 
-  const [editImage, setEditImage] =
-    useState<File | null>(null);
-  const [editPreview, setEditPreview] =
-    useState<string | null>(null);
+  const [editImages, setEditImages] = useState<FileList | null>(null);
 
   /* ---------- FETCH PRODUCTS ---------- */
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  /* ---------- ADD IMAGE SELECT ---------- */
-  const handleImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
   /* ---------- ADD PRODUCT ---------- */
   const handleAddProduct = () => {
-    if (!title || !description || !newPrice || !newStock) return;
+  if (!title || !description || !newPrice || !newStock) return;
 
-    const formData = new FormData();
+  const formData = new FormData();
 
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("price", newPrice);
-    formData.append("countInStock", newStock);
+  formData.append("title", title);
+  formData.append("description", description);
+  formData.append("price", newPrice);
+  formData.append("countInStock", newStock);
 
-    if (image) {
-      formData.append("image", image);
+  if (images) {
+    for (let i = 0; i < images.length; i++) {
+      formData.append("images", images[i]);
     }
+  }
 
-    dispatch(addProduct(formData as any));
+  dispatch(addProduct(formData as any));
 
-    setTitle("");
-    setDescription("");
-    setNewPrice("");
-    setNewStock("");
-    setImage(null);
-    setPreview(null);
-  };
+  setTitle("");
+  setDescription("");
+  setNewPrice("");
+  setNewStock("");
+  setImages(null);
+};
 
   /* ---------- EDIT START ---------- */
   const startEdit = (product: Product) => {
@@ -85,8 +67,6 @@ export default function AdminProducts() {
     setPrice(String(product.price));
     setStock(String(product.countInStock));
     setEditDescription(product.description || "");
-
-    setEditPreview(product.image || null);
   };
 
   /* ---------- SAVE EDIT ---------- */
@@ -97,25 +77,24 @@ export default function AdminProducts() {
     formData.append("countInStock", stock);
     formData.append("description", editDescription);
 
-    if (editImage) {
-      formData.append("image", editImage);
+    if (editImages) {
+      for (let i = 0; i < editImages.length; i++) {
+        formData.append("images", editImages[i]);
+      }
     }
 
     dispatch(updateProduct({ id, formData } as any));
 
     setEditingId(null);
-    setEditImage(null);
-    setEditPreview(null);
   };
 
   return (
     <AdminLayout>
-      <h1 className="text-xl font-bold mb-6">
-        Products
-      </h1>
+      <h1 className="text-xl font-bold mb-6">Products</h1>
 
       {/* ---------- ADD PRODUCT FORM ---------- */}
-      <div className="mb-6 flex gap-4 flex-wrap items-center">
+      <div className="mb-6 flex flex-col gap-3">
+
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -124,19 +103,26 @@ export default function AdminProducts() {
         />
 
         <textarea
-  value={description}
-  onChange={(e) => setDescription(e.target.value)}
-  placeholder="Product description"
-  rows={1}
-  className="bg-black border border-gray-700 px-3 py-1 w-64 resize-none"
-/>
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Product description"
+          rows={2}
+          className="bg-black border border-gray-700 px-3 py-1"
+        />
+
+        {/* MULTIPLE IMAGE UPLOAD */}
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={(e) => setImages(e.target.files)}
+          className="bg-black border border-gray-700 px-3 py-1"
+        />
 
         <input
           type="number"
           value={newPrice}
-          onChange={(e) =>
-            setNewPrice(e.target.value)
-          }
+          onChange={(e) => setNewPrice(e.target.value)}
           placeholder="Price"
           className="bg-black border border-gray-700 px-3 py-1"
         />
@@ -144,46 +130,26 @@ export default function AdminProducts() {
         <input
           type="number"
           value={newStock}
-          onChange={(e) =>
-            setNewStock(e.target.value)
-          }
+          onChange={(e) => setNewStock(e.target.value)}
           placeholder="Stock"
           className="bg-black border border-gray-700 px-3 py-1"
         />
 
-        <label className="bg-yellow-500 px-4 py-1 rounded cursor-pointer">
-          Add Image
-          <input
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={handleImageChange}
-          />
-        </label>
-
         <button
           onClick={handleAddProduct}
-          className="bg-green-600 px-4 py-1 rounded"
+          className="bg-green-600 px-4 py-1 rounded w-fit"
         >
           Add Product
         </button>
       </div>
 
-      {preview && (
-        <img
-          src={preview}
-          alt="preview"
-          className="w-32 mb-6 rounded"
-        />
-      )}
-
       {/* ---------- PRODUCT TABLE ---------- */}
       <table className="w-full text-sm border border-gray-800">
         <thead className="bg-black">
           <tr>
-            <th className="p-3">Image</th>
-            <th>Title</th>
+            <th className="p-3">Title</th>
             <th>Description</th>
+            <th>Images</th>
             <th>Price</th>
             <th>Stock</th>
             <th>Actions</th>
@@ -192,36 +158,33 @@ export default function AdminProducts() {
 
         <tbody>
           {products.map((p) => (
-            <tr
-              key={p._id}
-              className="border-t border-gray-800"
-            >
-              <td className="p-3">
-                {p.image && (
-                  <img
-                    src={p.image}
-                    alt={p.title}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                )}
-              </td>
+            <tr key={p._id} className="border-t border-gray-800">
+
               <td className="p-3">{p.title}</td>
 
               <td>
                 {editingId === p._id ? (
                   <textarea
                     value={editDescription}
-                    onChange={(e) =>
-                      setEditDescription(
-                        e.target.value
-                      )
-                    }
-                    className="bg-black border border-gray-700 px-2"
+                    onChange={(e) => setEditDescription(e.target.value)}
                     rows={2}
+                    className="bg-black border border-gray-700 px-2"
                   />
                 ) : (
                   p.description
                 )}
+              </td>
+
+              {/* PRODUCT IMAGES */}
+              <td className="flex gap-2">
+                {p.images?.map((img: string, i: number) => (
+                  <img
+                    key={i}
+                    src={img}
+                    alt=""
+                    className="w-12 h-12 object-cover rounded"
+                  />
+                ))}
               </td>
 
               <td>
@@ -229,9 +192,7 @@ export default function AdminProducts() {
                   <input
                     type="number"
                     value={price}
-                    onChange={(e) =>
-                      setPrice(e.target.value)
-                    }
+                    onChange={(e) => setPrice(e.target.value)}
                     className="bg-black border border-gray-700 w-20 px-2"
                   />
                 ) : (
@@ -244,9 +205,7 @@ export default function AdminProducts() {
                   <input
                     type="number"
                     value={stock}
-                    onChange={(e) =>
-                      setStock(e.target.value)
-                    }
+                    onChange={(e) => setStock(e.target.value)}
                     className="bg-black border border-gray-700 w-16 px-2"
                   />
                 ) : (
@@ -257,37 +216,15 @@ export default function AdminProducts() {
               <td className="flex flex-col gap-2">
                 {editingId === p._id ? (
                   <>
-                    <label className="bg-yellow-500 px-2 py-1 rounded cursor-pointer text-sm">
-                      Change Image
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file =
-                            e.target.files?.[0];
-                          if (file) {
-                            setEditImage(file);
-                            setEditPreview(
-                              URL.createObjectURL(file)
-                            );
-                          }
-                        }}
-                      />
-                    </label>
-
-                    {editPreview && (
-                      <img
-                        src={editPreview}
-                        alt="preview"
-                        className="w-20 rounded"
-                      />
-                    )}
+                    <input
+                      type="file"
+                      multiple
+                      onChange={(e) => setEditImages(e.target.files)}
+                      className="text-xs"
+                    />
 
                     <button
-                      onClick={() =>
-                        saveEdit(p._id)
-                      }
+                      onClick={() => saveEdit(p._id)}
                       className="text-green-400"
                     >
                       Save
@@ -296,20 +233,14 @@ export default function AdminProducts() {
                 ) : (
                   <>
                     <button
-                      onClick={() =>
-                        startEdit(p)
-                      }
+                      onClick={() => startEdit(p)}
                       className="text-yellow-400"
                     >
                       Edit
                     </button>
 
                     <button
-                      onClick={() =>
-                        dispatch(
-                          deleteProduct(p._id)
-                        )
-                      }
+                      onClick={() => dispatch(deleteProduct(p._id))}
                       className="text-red-400"
                     >
                       Delete
@@ -317,6 +248,7 @@ export default function AdminProducts() {
                   </>
                 )}
               </td>
+
             </tr>
           ))}
         </tbody>

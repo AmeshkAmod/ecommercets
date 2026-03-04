@@ -3,7 +3,6 @@ import * as productService from "../services/productService.js";
 import { CreateProductDTO } from "../types/productTypes.js";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
 
-
 /* =========================
    LIST PRODUCTS
 ========================= */
@@ -41,25 +40,31 @@ export const getProduct = async (
 };
 
 /* =========================
-   CREATE PRODUCT (✅ IMAGE SUPPORT)
+   CREATE PRODUCT (MULTIPLE IMAGES)
 ========================= */
 export const createProduct = async (
   req: Request<{ id: string }, {}, CreateProductDTO>,
   res: Response
 ) => {
   try {
-    let image: string | undefined;
+    const files = req.files as Express.Multer.File[];
 
-    if (req.file) {
-      image = await uploadToCloudinary(req.file.buffer);
+    const images: string[] = [];
+
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const url = await uploadToCloudinary(file.buffer);
+        images.push(url);
+      }
     }
 
     const product = await productService.createProduct({
       ...req.body,
-      image,
+      images,
     });
 
     res.status(201).json(product);
+
   } catch (error) {
     console.error("Create product error:", error);
     res.status(500).json({
@@ -69,37 +74,40 @@ export const createProduct = async (
 };
 
 /* =========================
-   UPDATE PRODUCT (✅ IMAGE UPDATE)
+   UPDATE PRODUCT (MULTIPLE IMAGE UPDATE)
 ========================= */
 export const updateProduct = async (
   req: Request<{ id: string }>,
   res: Response
 ) => {
   try {
-    let image: string | undefined;
 
-    if (req.file) {
-      console.log("uploading image to cloudinary");
-      image = await uploadToCloudinary(req.file.buffer);
-      console.log("CLOUDINARY URL", image);
+    const files = req.files as Express.Multer.File[];
+
+    let images: string[] | undefined;
+
+    if (files && files.length > 0) {
+      images = [];
+
+      for (const file of files) {
+        const url = await uploadToCloudinary(file.buffer);
+        images.push(url);
+      }
     }
-
-    console.log("Image url", image);
 
     const product = await productService.updateProduct(
       req.params.id,
       {
         ...req.body,
-        ...(image && { image }),
+        ...(images && { images }),
       }
     );
 
     res.json(product);
+
   } catch (error: any) {
     res.status(404).json({ message: error.message });
   }
-  console.log("FILE:", req.file);
-  console.log("BODY", req.body);
 };
 
 /* =========================
@@ -149,6 +157,7 @@ export const addProductReview = async (
       message: "Review added",
       product,
     });
+
   } catch (error: any) {
     res.status(400).json({
       message: error.message,

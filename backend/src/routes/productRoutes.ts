@@ -35,7 +35,7 @@ router.post(
   "/",
   protect,
   requirePermissions(PermissionKeys.CREATE_PRODUCT),
-  upload.single("image"),   // ⭐ IMAGE UPLOAD
+  upload.array("images", 5),   // ⭐ IMAGE UPLOAD
   createProduct
 );
 

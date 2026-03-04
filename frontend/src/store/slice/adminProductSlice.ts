@@ -1,6 +1,7 @@
 import type { Product } from "../../types/product";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../../api/api";
+import { data } from "react-router-dom";
 
 interface AdminProductState {
   products: Product[];
@@ -24,13 +25,19 @@ export const fetchProducts = createAsyncThunk<Product[]>(
 
 export const updateProduct = createAsyncThunk<
   Product,
-  { id: string; formData: FormData }
+  {
+    id: string
+    price: number
+    countInStock: number
+    description: string
+    images: string[]
+  }
 >(
   "adminProducts/update",
-  async ({ id, formData }) => {
+  async ({ id, ...data }) => {
     const res = await API.put(
       `/products/${id}`,
-      formData,
+      data,
       {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -54,20 +61,17 @@ export const deleteProduct = createAsyncThunk<
 
 export const addProduct = createAsyncThunk<
   Product,
-  FormData
+  {
+    title: string;
+    description: string;
+    price: number;
+    countInStock: number;
+    images: string[];
+  }
 >(
   "adminProducts/add",
-  async (formData) => {
-    const res = await API.post(
-      "/products",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
+  async (data) => {
+    const res = await API.post("/products", data);
     return res.data;
   }
 );
