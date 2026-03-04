@@ -15,18 +15,17 @@ export default function Product() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
 
-  const product = useAppSelector((state) =>
-    state.product.products.find(
-      (p) => String(p._id) === id
-    )
+  const { products } = useAppSelector((state) => state.product);
+
+  const product = products.find(
+    (p) => String(p._id) === id
   );
 
   useEffect(() => {
-    if (!id) return;
-    if (!product) {
+    if (id) {
       dispatch(fetchProductById(id));
     }
-  }, [dispatch, id, product]);
+  }, [dispatch, id]);
 
   if (!product) {
     return (
@@ -50,6 +49,23 @@ export default function Product() {
         className="relative p-6 bg-[#020617] min-h-screen text-gray-200 overflow-hidden"
       >
 
+        {/* FLOATING PARTICLES */}
+        {[...Array(25)].map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{ y: ["0%", "100%"], opacity: [0.2, 0.8, 0.2] }}
+            transition={{
+              duration: 10 + Math.random() * 10,
+              repeat: Infinity
+            }}
+            className="absolute w-1 h-1 bg-yellow-400 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`
+            }}
+          />
+        ))}
+
         {/* BACKGROUND GLOW */}
         <motion.div
           animate={{ y: [0, -60, 0] }}
@@ -63,6 +79,23 @@ export default function Product() {
           className="absolute w-96 h-96 bg-purple-500/10 blur-3xl rounded-full bottom-10 right-10"
         />
 
+        {/* FLOATING ICONS */}
+        <motion.div
+          animate={{ y: [0, -30, 0] }}
+          transition={{ duration: 6, repeat: Infinity }}
+          className="absolute left-10 top-40 text-yellow-400 text-5xl opacity-20"
+        >
+          🛒
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, 40, 0] }}
+          transition={{ duration: 8, repeat: Infinity }}
+          className="absolute right-20 top-32 text-yellow-400 text-5xl opacity-20"
+        >
+          📦
+        </motion.div>
+
         {/* Breadcrumb */}
         <motion.div
           initial={{ y: -10, opacity: 0 }}
@@ -75,7 +108,7 @@ export default function Product() {
           › {product.category || "Product"}
         </motion.div>
 
-        {/* PRODUCT LAYOUT */}
+        {/* PRODUCT GRID */}
         <motion.section
           initial="hidden"
           animate="show"
@@ -114,7 +147,6 @@ export default function Product() {
               show: { opacity: 1, x: 0 }
             }}
             whileHover={{ scale: 1.03 }}
-            className="transition"
           >
             <BuyBox product={product} />
           </motion.div>
