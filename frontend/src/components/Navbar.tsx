@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState,useRef, type FormEvent } from "react";
 import { logout } from "../store/slice/authSlice";
 import { fetchCart } from "../store/slice/cartSlice";
 import type { RootState } from "../store/store";
@@ -16,6 +16,7 @@ export default function Navbar() {
 
   const [search, setSearch] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
   const [mobileMenu, setMobileMenu] = useState(false);
 
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -26,6 +27,22 @@ export default function Navbar() {
       dispatch(fetchCart());
     }
   }, [dispatch, user]);
+  useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      profileRef.current &&
+      !profileRef.current.contains(event.target as Node)
+    ) {
+      setProfileOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
   const totalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -183,7 +200,7 @@ export default function Navbar() {
 
           {/* PROFILE */}
           {isAuthenticated && (
-            <div className="relative">
+            <div className="relative" ref={profileRef}>
 
               <button
                 onClick={() => setProfileOpen(!profileOpen)}
@@ -208,7 +225,7 @@ export default function Navbar() {
                     </button>
                   )}
 
-                  <Link to="/profile" className="block px-4 py-2 hover:bg-gray-800">
+                  <Link to="/profile"  onClick={() => setProfileOpen(false)} className="block px-4 py-2 hover:bg-gray-800">
                     My Profile
                   </Link>
 
