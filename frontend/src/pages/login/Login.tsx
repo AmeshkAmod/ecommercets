@@ -55,16 +55,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#020617]">
-
       {/* PARTICLES */}
       {[...Array(25)].map((_, i) => (
         <motion.div
           key={i}
           animate={{ y: ["0%", "100%"], opacity: [0.2, 0.8, 0.2] }}
-          transition={{
-            duration: 10 + Math.random() * 10,
-            repeat: Infinity,
-          }}
+          transition={{ duration: 10 + Math.random() * 10, repeat: Infinity }}
           className="absolute w-1 h-1 bg-yellow-400 rounded-full"
           style={{
             left: `${Math.random() * 100}%`,
@@ -72,6 +68,31 @@ export default function Login() {
           }}
         />
       ))}
+
+      {/* DELIVERY ROAD */}
+      <div className="absolute bottom-24 w-full h-[2px] bg-gray-700"></div>
+
+      {/* ROAD DASHES */}
+      <motion.div
+        animate={{ x: ["0%", "-100%"] }}
+        transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+        className="absolute bottom-24 w-full h-[2px] border-t border-dashed border-gray-500"
+      />
+     {/* DELIVERY TRUCK */}
+
+
+<motion.div
+  initial={{ x: "120%" }}   // start off-screen left
+  animate={{ x: "-20%" }}   // move to right
+  transition={{
+    repeat: Infinity,
+    duration: 14,
+    ease: "linear"
+  }}
+  className="absolute bottom-20 text-4xl scale-x-[-1]"
+>
+  🚛
+</motion.div>
 
       {/* FLOATING CART ICONS */}
       <motion.div
@@ -87,7 +108,7 @@ export default function Login() {
         transition={{ duration: 7, repeat: Infinity }}
         className="absolute right-24 bottom-32 text-yellow-400 text-6xl opacity-20"
       >
-        🛍
+        📦
       </motion.div>
 
       {/* LOGIN CARD */}
@@ -98,7 +119,6 @@ export default function Login() {
         className="relative w-full max-w-sm rounded-3xl p-px bg-gradient-to-br from-yellow-400/30 to-transparent"
       >
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-7 text-gray-200 shadow-2xl">
-
           {/* LOGO */}
           <motion.h1
             animate={{ y: [0, -4, 0] }}
@@ -113,19 +133,15 @@ export default function Login() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-
             {/* EMAIL */}
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <label className="text-xs text-gray-400 mb-1 block">
-                Email
-              </label>
+              <label className="text-xs text-gray-400 mb-1 block">Email</label>
 
               <input
                 type="email"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                placeholder="typing..."
                 required
                 className="w-full bg-black/40 border border-gray-700 rounded-xl px-3 py-2 text-sm
                 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
@@ -149,7 +165,6 @@ export default function Login() {
                   focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
                 />
 
-                {/* SHOW PASSWORD */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -179,7 +194,7 @@ export default function Login() {
               whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={status === "loading"}
-              className="w-full mt-2 bg-yellow-400 text-black py-2.5 rounded-xl font-semibold text-sm hover:brightness-110"
+              className="w-full mt-2 bg-yellow-400 text-black py-2.5 rounded-xl font-semibold text-sm"
             >
               {status === "loading" ? "Signing in..." : "Sign in"}
             </motion.button>
@@ -195,7 +210,6 @@ export default function Login() {
               Create one
             </Link>
           </p>
-
         </div>
       </motion.div>
     </div>
