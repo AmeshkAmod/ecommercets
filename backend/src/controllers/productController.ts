@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as productService from "../services/productService.js";
 import { CreateProductDTO } from "../types/productTypes.js";
+import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
 
 
 /* =========================
@@ -47,7 +48,11 @@ export const createProduct = async (
   res: Response
 ) => {
   try {
-    const image = req.file?.filename; // ⭐ multer image
+    let image: string | undefined;
+
+    if (req.file) {
+      image = await uploadToCloudinary(req.file.buffer);
+    }
 
     const product = await productService.createProduct({
       ...req.body,
@@ -71,7 +76,15 @@ export const updateProduct = async (
   res: Response
 ) => {
   try {
-    const image = req.file?.filename;
+    let image: string | undefined;
+
+    if (req.file) {
+      console.log("uploading image to cloudinary");
+      image = await uploadToCloudinary(req.file.buffer);
+      console.log("CLOUDINARY URL", image);
+    }
+
+    console.log("Image url", image);
 
     const product = await productService.updateProduct(
       req.params.id,
@@ -85,6 +98,8 @@ export const updateProduct = async (
   } catch (error: any) {
     res.status(404).json({ message: error.message });
   }
+  console.log("FILE:", req.file);
+  console.log("BODY", req.body);
 };
 
 /* =========================

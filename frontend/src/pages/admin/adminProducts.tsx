@@ -86,11 +86,7 @@ export default function AdminProducts() {
     setStock(String(product.countInStock));
     setEditDescription(product.description || "");
 
-    setEditPreview(
-      product.image
-        ? `http://localhost:5000/uploads/${product.image}`
-        : null
-    );
+    setEditPreview(product.image || null);
   };
 
   /* ---------- SAVE EDIT ---------- */
@@ -185,7 +181,8 @@ export default function AdminProducts() {
       <table className="w-full text-sm border border-gray-800">
         <thead className="bg-black">
           <tr>
-            <th className="p-3">Title</th>
+            <th className="p-3">Image</th>
+            <th>Title</th>
             <th>Description</th>
             <th>Price</th>
             <th>Stock</th>
@@ -199,6 +196,15 @@ export default function AdminProducts() {
               key={p._id}
               className="border-t border-gray-800"
             >
+              <td className="p-3">
+                {p.image && (
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                )}
+              </td>
               <td className="p-3">{p.title}</td>
 
               <td>

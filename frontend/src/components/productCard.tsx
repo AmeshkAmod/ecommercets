@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { addToCart } from "../store/slice/cartSlice";
 import { useNavigate, Link } from "react-router-dom";
 import { useState, type MouseEvent } from "react";
@@ -10,12 +10,13 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const {token} = useAppSelector((state: RootState) => state.auth);
+  const isAuthenticated = !!token;
 
-  const cartStatus = useSelector((state: RootState) => state.cart.status);
+  const cartStatus = useAppSelector((state: RootState) => state.cart.status);
 
   const [added, setAdded] = useState<boolean>(false);
 
@@ -50,7 +51,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     <div className="bg-black border border-gray-800 rounded-xl p-4 text-gray-200 flex flex-col hover:border-yellow-400 transition">
       <Link to={`/product/${product._id}`}>
         <img
-           src={`http://localhost:5000/uploads/${product.image}`}
+           src={product.image}
           alt={product.title}
           className="h-40 w-full object-contain mb-3 hover:scale-105 transition-transform"
         />

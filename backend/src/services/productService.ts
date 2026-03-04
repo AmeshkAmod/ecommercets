@@ -39,7 +39,7 @@ export const updateProduct = async (
   const product = await ProductModel.findByIdAndUpdate(
     id,
     data,
-    { new: true },
+    { returnDocument: "after" },
   );
 
   if (!product) {
