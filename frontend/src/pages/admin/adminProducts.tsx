@@ -22,8 +22,8 @@ export default function AdminProducts() {
   const [newPrice, setNewPrice] = useState("");
   const [newStock, setNewStock] = useState("");
 
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [images, setImages] = useState<File[]>([]);
+  const [preview, setPreview] = useState<string[]>([]);
 
   /* ---------- EDIT STATES ---------- */
   const [editingId, setEditingId] =
@@ -47,11 +47,15 @@ export default function AdminProducts() {
   const handleImageChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
-    }
+    const files = Array.from(e.target.files || []);
+
+      setImages(files);
+
+      const previews = files.map((file) => 
+        URL.createObjectURL(file)
+      );
+
+      setPreview(previews);
   };
 
   /* ---------- ADD PRODUCT ---------- */
@@ -65,9 +69,9 @@ export default function AdminProducts() {
     formData.append("price", newPrice);
     formData.append("countInStock", newStock);
 
-    if (image) {
-      formData.append("image", image);
-    }
+    images.forEach((file) => {
+      formData.append("images", file);
+    });
 
     dispatch(addProduct(formData as any));
 
@@ -75,8 +79,8 @@ export default function AdminProducts() {
     setDescription("");
     setNewPrice("");
     setNewStock("");
-    setImage(null);
-    setPreview(null);
+    setImages([]);
+    setPreview([]);
   };
 
   /* ---------- EDIT START ---------- */
@@ -86,7 +90,7 @@ export default function AdminProducts() {
     setStock(String(product.countInStock));
     setEditDescription(product.description || "");
 
-    setEditPreview(product.image || null);
+    setEditPreview(product.images?.[0] || null);
   };
 
   /* ---------- SAVE EDIT ---------- */
@@ -98,7 +102,7 @@ export default function AdminProducts() {
     formData.append("description", editDescription);
 
     if (editImage) {
-      formData.append("image", editImage);
+      formData.append("images", editImage);
     }
 
     dispatch(updateProduct({ id, formData } as any));
@@ -155,8 +159,9 @@ export default function AdminProducts() {
           Add Image
           <input
             type="file"
-            accept="image/*"
+            multiple
             hidden
+            accept="image/*"
             onChange={handleImageChange}
           />
         </label>
@@ -169,13 +174,16 @@ export default function AdminProducts() {
         </button>
       </div>
 
-      {preview && (
-        <img
-          src={preview}
-          alt="preview"
-          className="w-32 mb-6 rounded"
-        />
-      )}
+      
+      <div>
+        {preview.map((p, i) => (
+          <img
+            key={i}
+            src={p}
+            className="w-20 h-20 object-cover rounded"
+          />
+        ))}
+      </div>
 
       {/* ---------- PRODUCT TABLE ---------- */}
       <table className="w-full text-sm border border-gray-800">
@@ -197,9 +205,9 @@ export default function AdminProducts() {
               className="border-t border-gray-800"
             >
               <td className="p-3">
-                {p.image && (
+                {p.images?.[0] && (
                   <img
-                    src={p.image}
+                    src={p.images[0]}
                     alt={p.title}
                     className="w-16 h-16 object-cover rounded"
                   />

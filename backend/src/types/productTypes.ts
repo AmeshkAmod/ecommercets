@@ -3,7 +3,7 @@ export interface CreateProductDTO {
     price: number;
     description?: string;
     category?: string;
-    image?: string;
+    image?: string[];
     countInStock?: number;
 }
 
