@@ -21,7 +21,8 @@ export default function AdminOrders() {
         <thead className="bg-black">
           <tr>
             <th className="p-3">ID</th>
-            <th>User</th>
+            <th>Products</th>
+            <th>User Mail</th>
             <th>Total</th>
             <th>Status</th>
             <th>Date</th>
@@ -31,6 +32,10 @@ export default function AdminOrders() {
           {orders?.map((o: Order) => (
             <tr key={o._id} className="border-t border-gray-800">
               <td className="p-3">{o._id?.slice(-6)}</td>
+              <td>{o.items
+                .map((item: any) => item.product?.title)
+                .join(" ,  ")}
+              </td>
               <td>{o.user?.email || "N/A"}</td>
               <td>₹{o.total}</td>
               <td>{o.status}</td>

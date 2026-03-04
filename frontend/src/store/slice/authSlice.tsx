@@ -21,62 +21,89 @@ export const loginUser = createAsyncThunk<
   AuthUser,
   { email: string; password: string },
   { rejectValue: string }
->(
-  "auth/login",
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const res = await API.post("/auth/login", credentials);
-      const { token, user } = res.data;
+>("auth/login", async (credentials, { rejectWithValue }) => {
+  try {
+    const res = await API.post("/auth/login", credentials);
+    const { token, user } = res.data;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
 
-      return user; // ✅ return only user
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Login failed"
-      );
-    }
+    return user; // ✅ return only user
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || "Login failed");
   }
-);
+});
 
 export const forgotPassword = createAsyncThunk<
   string,
   string,
   { rejectValue: string }
->(
-  "auth/forgotPassword",
-  async (email, { rejectWithValue }) => {
-    try {
-      const res = await API.post("/auth/forgot-password", { email });
-      return res.data.message;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to send reset link"
-      );
-    }
+>("auth/forgotPassword", async (email, { rejectWithValue }) => {
+  try {
+    const res = await API.post("/auth/forgot-password", { email });
+    return res.data.message;
+  } catch (error: any) {
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to send reset link",
+    );
   }
-);
+});
 export const resetPassword = createAsyncThunk<
   string,
   { token: string; password: string },
   { rejectValue: string }
->(
-  "auth/resetPassword",
-  async ({ token, password }, { rejectWithValue }) => {
-    try {
-      const res = await API.post(
-        `/auth/reset-password/${token}`,
-        { password }
-      );
-      return res.data.message;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Password reset failed"
-      );
-    }
+>("auth/resetPassword", async ({ token, password }, { rejectWithValue }) => {
+  try {
+    const res = await API.post(`/auth/reset-password/${token}`, { password });
+    return res.data.message;
+  } catch (error: any) {
+    return rejectWithValue(
+      error.response?.data?.message || "Password reset failed",
+    );
   }
-);
+});
+export const fetchCurrentUser = createAsyncThunk<
+  AuthUser,
+  void,
+  { rejectValue: string }
+>("auth/fetchCurrentUser", async (_, { rejectWithValue }) => {
+  try {
+    const res = await API.get("/users/me");
+    return res.data;
+  } catch (error: any) {
+    return rejectWithValue("Failed to fetch user");
+  }
+});
+export const updateProfile = createAsyncThunk<
+  AuthUser,
+  {
+    name: string;
+
+    phone: string;
+    address: {
+      street: string;
+      city: string;
+      state: string;
+      postalCode: string;
+      country: string;
+    };
+  },
+  { rejectValue: string }
+>("auth/updateProfile", async (data, { rejectWithValue }) => {
+  try {
+    const res = await API.put("/users/me", data);
+
+    // Update localStorage
+    localStorage.setItem("user", JSON.stringify(res.data));
+
+    return res.data;
+  } catch (error: any) {
+    return rejectWithValue(
+      error.response?.data?.message || "Profile update failed",
+    );
+  }
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -103,6 +130,22 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload ?? "Login failed";
+      })
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+  state.user = action.payload;
+})
+      .addCase(updateProfile.pending, (state) => {
+        state.status = "loading";
+      })
+
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload;
+      })
+
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload ?? "Profile update failed";
       });
   },
 });

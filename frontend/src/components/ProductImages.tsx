@@ -10,7 +10,7 @@ export default function ProductImages({ product }: ProductImagesProps) {
       <img
         src={product.image}
         alt={product.title}
-        className="max-h-[320px] object-contain"
+        className="max-h-80 object-contain"
       />
     </div>
   );
