@@ -40,7 +40,6 @@ export default function Navbar() {
 
   const isAdmin = user?.role?.some((r) => r.name === "ADMIN") ?? false;
 
-  /* SEARCH SUGGESTIONS */
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (search.trim().length < 2) {
@@ -71,7 +70,6 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-[#020617] border-b border-gray-800">
 
-      {/* NAVBAR */}
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
 
         {/* MOBILE MENU BUTTON */}
@@ -81,6 +79,16 @@ export default function Navbar() {
         >
           ☰
         </button>
+
+        {/* ADMIN PANEL LEFT SIDE */}
+        {isAdmin && (
+          <button
+            onClick={() => navigate("/admin")}
+            className="hidden lg:block text-indigo-400 font-semibold hover:text-indigo-300"
+          >
+            Admin Panel
+          </button>
+        )}
 
         {/* LOGO */}
         <Link
@@ -107,7 +115,6 @@ export default function Navbar() {
             🔍
           </button>
 
-          {/* SEARCH DROPDOWN */}
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute left-0 right-0 mt-2 bg-[#020617] border border-gray-700 rounded-lg shadow-xl max-h-72 overflow-y-auto z-50">
               {suggestions.map((product) => (
@@ -164,6 +171,16 @@ export default function Navbar() {
             )}
           </Link>
 
+          {/* LOGIN BUTTON (ADDED ONLY THIS PART) */}
+          {!isAuthenticated && (
+            <Link
+              to="/login"
+              className="px-4 py-1 rounded-full bg-yellow-400 text-black font-semibold hover:bg-yellow-300"
+            >
+              Login
+            </Link>
+          )}
+
           {/* PROFILE */}
           {isAuthenticated && (
             <div className="relative">
@@ -181,6 +198,15 @@ export default function Navbar() {
                   <div className="p-4 border-b border-gray-800">
                     <p className="font-semibold">{user?.name}</p>
                   </div>
+
+                  {isAdmin && (
+                    <button
+                      onClick={() => navigate("/admin")}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-800 text-indigo-400"
+                    >
+                      Admin Panel
+                    </button>
+                  )}
 
                   <Link to="/profile" className="block px-4 py-2 hover:bg-gray-800">
                     My Profile
