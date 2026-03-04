@@ -48,7 +48,7 @@ export const createProduct = async (
   try {
     let image: string[] = [];
 
-    if (req.file) {
+    if (req.files) {
       const files = req.files as Express.Multer.File[];
 
       for(const file of files) {
@@ -67,6 +67,7 @@ export const createProduct = async (
     console.error("Create product error:", error);
     res.status(500).json({message: "Failed to create product",});
   }
+  console.log("FILES:", req.files);
 };
 
 /* =========================
@@ -81,7 +82,7 @@ export const updateProduct = async (
 
     let images = product.images || [];
 
-    if (req.file) {
+    if (req.files) {
       const files = req.files as Express.Multer.File[];
 
       //delete old images

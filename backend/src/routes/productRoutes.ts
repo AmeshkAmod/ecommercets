@@ -35,7 +35,7 @@ router.post(
   "/",
   protect,
   requirePermissions(PermissionKeys.CREATE_PRODUCT),
-  upload.array("image", 5),   //  IMAGE UPLOAD
+  upload.array("images", 5),   //  IMAGE UPLOAD
   createProduct
 );
 
@@ -44,7 +44,7 @@ router.put(
   "/:id",
   protect,
   requirePermissions(PermissionKeys.UPDATE_PRODUCT),
-  upload.array("image", 5),   //  allow image update
+  upload.array("images", 5),   //  allow image update
   updateProduct
 );
 

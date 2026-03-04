@@ -204,14 +204,14 @@ export default function AdminProducts() {
               key={p._id}
               className="border-t border-gray-800"
             >
-              <td className="p-3">
-                {p.images?.[0] && (
+              <td className="p-3 flex gap-2">
+                {p.images?.slice(0,3).map((img: string, i: number) => (
                   <img
-                    src={p.images[0]}
-                    alt={p.title}
-                    className="w-16 h-16 object-cover rounded"
+                    key={i}
+                    src={img}
+                    className="w-12 h-12 object-cover rounded"
                   />
-                )}
+                ))}
               </td>
               <td className="p-3">{p.title}</td>
 
