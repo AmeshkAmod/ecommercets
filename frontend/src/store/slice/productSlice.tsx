@@ -4,12 +4,14 @@ import API from "../../api/api";
 
 interface ProductState {
   products: Product[],
+  product: Product | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
 const initialState: ProductState = {
   products: [],
+  product: null,
   status: "idle",
   error: null,
 }
