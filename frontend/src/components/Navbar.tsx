@@ -145,7 +145,11 @@ export default function Navbar() {
                   className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-800"
                 >
                   <img
-                    src={product.image}
+                    src={
+                      Array.isArray(product.images)
+                      ? product.images[0]
+                      : (product as any).images
+                    }
                     alt={product.title}
                     className="w-10 h-10 object-cover rounded"
                   />
