@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useDispatch } from "react-redux";
 import type { CartItem } from "../types/cart";
 import type { AppDispatch } from "../store/store";
@@ -8,17 +9,29 @@ import {
 
 interface CartItemProps {
   item: CartItem;
+  onRemove?: (productId: string, sourceElement: HTMLElement) => void;
 }
 
-export default function CartItem({ item }: CartItemProps) {
+export default function CartItem({ item, onRemove }: CartItemProps) {
   const dispatch = useDispatch<AppDispatch>();
+  const cardRef = useRef<HTMLDivElement>(null);
   const product = item.productId;
 
   if (!product) return null;
 
+  const handleRemove = () => {
+    const sourceElement = cardRef.current;
+    if (onRemove && sourceElement) {
+      onRemove(product._id, sourceElement);
+      return;
+    }
+
+    dispatch(removeFromCart(product._id));
+  };
+
   const handleDecrease = () => {
     if (item.quantity === 1) {
-      dispatch(removeFromCart(product._id));
+      handleRemove();
     } else {
       dispatch(
         updateCartItem({
@@ -39,7 +52,10 @@ export default function CartItem({ item }: CartItemProps) {
   };
 
   return (
-    <div className="grid grid-cols-[100px_1fr] gap-4 bg-[#020617] border border-gray-800 rounded-xl p-4">
+    <div
+      ref={cardRef}
+      className="grid grid-cols-[100px_1fr] gap-4 bg-[#020617] border border-gray-800 rounded-xl p-4"
+    >
       <div className="flex items-center justify-center border border-gray-800 rounded-lg p-2">
         <img
           src={
@@ -78,7 +94,7 @@ export default function CartItem({ item }: CartItemProps) {
           </div>
 
           <button
-            onClick={() => dispatch(removeFromCart(product._id))}
+            onClick={handleRemove}
             className="text-xs text-red-400 border border-red-400 px-3 py-1 rounded-full hover:bg-red-500/10"
           >
             Remove
