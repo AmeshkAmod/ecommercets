@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import type { Product } from "../types/product";
 
 interface ProductInfoProps {
@@ -6,41 +7,72 @@ interface ProductInfoProps {
 
 export default function ProductInfo({ product }: ProductInfoProps) {
   return (
-    <div className="bg-[#020617] border border-gray-800 rounded-xl p-5">
-      <span className="inline-block text-xs px-3 py-1 rounded-full border border-gray-600 text-gray-300 mb-3">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.4 }}
+      className="bg-[#020617] border border-gray-800 rounded-xl p-5"
+    >
+      <motion.span
+        whileHover={{ scale: 1.05 }}
+        className="inline-block text-xs px-3 py-1 rounded-full border border-gray-600 text-gray-300 mb-3"
+      >
         {product.category || "Category"}
-      </span>
+      </motion.span>
 
-      <h1 className="text-xl font-bold">{product.title}</h1>
+      <motion.h1
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="text-xl font-bold"
+      >
+        {product.title}
+      </motion.h1>
 
       {/* Rating */}
-      <div className="flex items-center gap-2 text-sm mt-2">
+      <motion.div
+        className="flex items-center gap-2 text-sm mt-2"
+        animate={{ opacity: [0.7, 1, 0.7] }}
+        transition={{ repeat: Infinity, duration: 2 }}
+      >
         <span className="text-yellow-400">
           {"★".repeat(Math.round(product.rating ?? 4))}
         </span>
         <span className="text-gray-400">
           ({product.numReviews ?? 0} reviews)
         </span>
-      </div>
+      </motion.div>
 
       {/* Price */}
-      <div className="text-2xl font-extrabold text-yellow-400 mt-3">
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        className="text-2xl font-extrabold text-yellow-400 mt-3"
+      >
         ₹{product.price}
-      </div>
+      </motion.div>
 
       {/* Stock */}
-      <div
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
         className={`text-sm mt-1 ${
           product.countInStock > 0 ? "text-green-400" : "text-red-400"
         }`}
       >
         {product.countInStock > 0 ? "In stock" : "Out of stock"}
-      </div>
+      </motion.div>
 
       {/* Description */}
-      <p className="text-gray-400 text-sm mt-4 leading-relaxed">
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="text-gray-400 text-sm mt-4 leading-relaxed"
+      >
         {product.description}
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 }
