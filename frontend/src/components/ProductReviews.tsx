@@ -17,6 +17,13 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
   const { token } = useSelector((state: RootState) => state.auth);
   const isAuthenticated = !!token;
 
+  const { status } = useSelector((state: RootState) => state.product);
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const alreadyReviewed = product.reviews?.some(
+    (r) => r.user === user?._id
+  );
+
   const [rating, setRating] = useState<number | "">("");
   const [comment, setComment] = useState<string>("");
 
@@ -39,6 +46,18 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
     setRating("");
     setComment("");
   };
+
+  const ratingCounts = [5,4,3,2,1].map((star) => {
+    const count =
+      product.reviews?.filter((r) => r.rating === star).length || 0;
+
+      const percent =
+        product.reviews && product.reviews.length
+          ? (count / product.reviews.length) * 100
+          : 0;
+
+    return { star, count, percent };
+  })
 
   return (
     <motion.section
@@ -65,7 +84,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
           </div>
 
           <div className="text-yellow-400 text-sm">
-            {"★".repeat(review.rating)}
+            {"★".repeat(review.rating) + "★".repeat(5 - review.rating)}
           </div>
 
           <p className="text-gray-400 text-sm mt-1">{review.comment}</p>
@@ -73,23 +92,30 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
       ))}
 
       {/* Review Form */}
+      {alreadyReviewed ? (
+        <p className="mt-4 text-yellow-400 text-sm">
+          You already reviewed this product.
+        </p>
+      ) : (
       <div className="mt-6">
         <h3 className="text-sm font-semibold mb-2">Write a review</h3>
 
-        <select
-          value={rating}
-          onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-            setRating(e.target.value ? Number(e.target.value) : "")
-          }
-          className="w-full mb-2 bg-[#020617] border border-gray-700 rounded p-2 text-sm"
-        >
-          <option value="">Select rating</option>
-          <option value="5">⭐ 5 - Excellent</option>
-          <option value="4">⭐ 4 - Good</option>
-          <option value="3">⭐ 3 - Average</option>
-          <option value="2">⭐ 2 - Poor</option>
-          <option value="1">⭐ 1 - Terrible</option>
-        </select>
+        <div className="flex gap-1 mb-3">
+          {[1,2,3,4,5].map((star) => (
+            <span
+              key={star}
+              onMouseEnter={() => setRating(star)}
+              className={`cursor-pointer text-2xl transition ${
+                rating && star <= rating
+                ? "text-yellow-400"
+                : "text-gray-600"
+              }`}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+
 
         <textarea
           value={comment}
@@ -101,15 +127,17 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
         />
 
         <motion.button
+          disabled={status === "loading"}
           onClick={submitHandler}
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
           transition={{ type: "spring", stiffness: 300 }}
-          className="mt-2 bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-semibold"
+          className="mt-2 bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-semibold disabled:opacity-50"
         >
-          Submit Review
+          {status === "loading" ? "Submitting..." : "Submit Review"}
         </motion.button>
       </div>
+      )}
     </motion.section>
   );
 }
