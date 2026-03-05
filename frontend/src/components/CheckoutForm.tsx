@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 import API from "../api/api";
 import { clearCart } from "../store/slice/cartSlice";
 import type { CartItem } from "../types/cart";
@@ -68,7 +69,7 @@ export default function CheckoutForm({ items }: CheckoutFormProps) {
 
       const total = items.reduce(
         (sum, item) => sum + item.productId.price * item.quantity,
-        0
+        0,
       );
 
       await API.post("/orders", {
@@ -83,8 +84,7 @@ export default function CheckoutForm({ items }: CheckoutFormProps) {
 
       setTimeout(() => {
         navigate("/");
-      }, 2000);
-
+      }, 2500);
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         setStatus(err.response?.data?.message || "Order failed");
@@ -95,7 +95,11 @@ export default function CheckoutForm({ items }: CheckoutFormProps) {
   };
 
   return (
-    <section className="bg-[#020617] border border-gray-800 rounded-xl p-5">
+    <motion.section
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-[#020617] border border-gray-800 rounded-xl p-5 relative overflow-hidden"
+    >
       <h2 className="font-semibold mb-4">Shipping Address</h2>
 
       {(
@@ -109,9 +113,7 @@ export default function CheckoutForm({ items }: CheckoutFormProps) {
         ] as { label: string; name: keyof ShippingAddress }[]
       ).map((f) => (
         <div key={f.name} className="mb-3">
-          <label className="block text-xs text-gray-400 mb-1">
-            {f.label}
-          </label>
+          <label className="block text-xs text-gray-400 mb-1">{f.label}</label>
           <input
             type="text"
             name={f.name}
@@ -137,20 +139,37 @@ export default function CheckoutForm({ items }: CheckoutFormProps) {
         ))}
       </div>
 
-      <button
+      <motion.button
         onClick={placeOrder}
         disabled={success}
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 300 }}
         className="mt-5 w-full bg-yellow-400 text-black py-2 rounded-full font-semibold text-sm
                    disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {success ? "Order Placed" : "Place Order"}
-      </button>
+      </motion.button>
 
-      {status && (
-        <p className="text-xs mt-3 text-gray-400">
-          {status}
-        </p>
-      )}
-    </section>
+      {status && <p className="text-xs mt-3 text-gray-400">{status}</p>}
+
+      {/* Truck Animation */}
+      <AnimatePresence>
+        {success && (
+          <motion.div
+            initial={{ x: "120%" }} // start off-screen left
+            animate={{ x: "-20%" }} // move to right
+            transition={{
+              repeat: Infinity,
+              duration: 4,
+              ease: "linear",
+            }}
+            className="absolute bottom-20 text-4xl scale-x-[-1]"
+          >
+            🚛
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.section>
   );
 }
