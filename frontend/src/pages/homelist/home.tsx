@@ -52,11 +52,11 @@ export default function Home() {
 
         {/* DELIVERY TRUCK */}
         <motion.div
-          initial={{ x: "-20%" }}
-          animate={{ x: "120%" }}
+          initial={{ x: "120%" }}
+          animate={{ x: "-20%" }}
           transition={{
             repeat: Infinity,
-            duration: 18,
+            duration: 2,
             ease: "linear"
           }}
           className="absolute bottom-10 text-4xl scale-x-[-1]"
