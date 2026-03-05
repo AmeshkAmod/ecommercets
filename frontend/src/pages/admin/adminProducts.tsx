@@ -43,6 +43,8 @@ export default function AdminProducts() {
     dispatch(fetchProducts());
   }, [dispatch]);
 
+  console.log(products);
+
   /* ---------- ADD IMAGE SELECT ---------- */
   const handleImageChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -184,7 +186,7 @@ export default function AdminProducts() {
           />
         ))}
       </div>
-
+  
       {/* ---------- PRODUCT TABLE ---------- */}
       <table className="w-full text-sm border border-gray-800">
         <thead className="bg-black">

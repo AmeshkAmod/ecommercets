@@ -58,7 +58,7 @@ const productSchema = new Schema(
     description: String,
     category: String,
     
-    image: {
+    images: {
       type: [String],
       default: []
     },
