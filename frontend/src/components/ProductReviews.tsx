@@ -53,24 +53,24 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
         <p className="text-gray-400 text-sm">No reviews yet.</p>
       )}
 
-      {product.reviews?.map((review) => (
-        <div key={review._id} className="border-t border-gray-800 pt-3 mt-3">
-          <div className="flex justify-between text-sm">
-            <span className="font-semibold">{review.name}</span>
-            <span className="text-gray-500">
-              {review.createdAt
-                ? new Date(review.createdAt).toLocaleDateString()
-                : ""}
-            </span>
-          </div>
+      {product.reviews?.map((review, index) => (
+  <div key={`${review._id}-${index}`} className="border-t border-gray-800 pt-3 mt-3">
+    <div className="flex justify-between text-sm">
+      <span className="font-semibold">{review.name}</span>
+      <span className="text-gray-500">
+        {review.createdAt
+          ? new Date(review.createdAt).toLocaleDateString()
+          : ""}
+      </span>
+    </div>
 
-          <div className="text-yellow-400 text-sm">
-            {"★".repeat(review.rating)}
-          </div>
+    <div className="text-yellow-400 text-sm">
+      {"★".repeat(review.rating)}
+    </div>
 
-          <p className="text-gray-400 text-sm mt-1">{review.comment}</p>
-        </div>
-      ))}
+    <p className="text-gray-400 text-sm mt-1">{review.comment}</p>
+  </div>
+))}
 
       {/* Review Form */}
       <div className="mt-6">
