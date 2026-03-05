@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { submitReview } from "../store/slice/productSlice";
 import type { Product } from "../types/product";
 import type { RootState, AppDispatch } from "../store/store";
@@ -13,8 +14,8 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
- const { token } = useSelector((state: RootState) => state.auth);
-const isAuthenticated = !!token;
+  const { token } = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = !!token;
 
   const [rating, setRating] = useState<number | "">("");
   const [comment, setComment] = useState<string>("");
@@ -40,7 +41,12 @@ const isAuthenticated = !!token;
   };
 
   return (
-    <section className="mt-10 bg-[#020617] border border-gray-800 rounded-xl p-5">
+    <motion.section
+      className="mt-10 bg-[#020617] border border-gray-800 rounded-xl p-5"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <h2 className="font-semibold mb-4">Customer Reviews</h2>
 
       {product.reviews?.length === 0 && (
@@ -62,9 +68,7 @@ const isAuthenticated = !!token;
             {"★".repeat(review.rating)}
           </div>
 
-          <p className="text-gray-400 text-sm mt-1">
-            {review.comment}
-          </p>
+          <p className="text-gray-400 text-sm mt-1">{review.comment}</p>
         </div>
       ))}
 
@@ -96,13 +100,16 @@ const isAuthenticated = !!token;
           className="w-full bg-[#020617] border border-gray-700 rounded p-2 text-sm"
         />
 
-        <button
+        <motion.button
           onClick={submitHandler}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.92 }}
+          transition={{ type: "spring", stiffness: 300 }}
           className="mt-2 bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-semibold"
         >
           Submit Review
-        </button>
+        </motion.button>
       </div>
-    </section>
+    </motion.section>
   );
 }

@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import * as productService from "../services/productService.js";
 import { CreateProductDTO } from "../types/productTypes.js";
 import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
+import { deleteCloudinaryImage } from "../utils/deleteColudinaryImage.js";
+import { Product } from "../models/Product.js";
 
 
 /* =========================
@@ -15,10 +17,7 @@ export const listProducts = async (req: Request, res: Response) => {
 
     res.json(products);
   } catch (error) {
-    console.error("List products error:", error);
-    res.status(500).json({
-      message: "Failed to fetch products",
-    });
+    res.status(500).json({message: "Failed to fetch products"});
   }
 };
 
@@ -33,7 +32,6 @@ export const getProduct = async (
     const product = await productService.getProductById(
       req.params.id
     );
-
     res.json(product);
   } catch (error: any) {
     res.status(404).json({ message: error.message });
@@ -48,10 +46,15 @@ export const createProduct = async (
   res: Response
 ) => {
   try {
-    let image: string | undefined;
+    let image: string[] = [];
 
-    if (req.file) {
-      image = await uploadToCloudinary(req.file.buffer);
+    if (req.files) {
+      const files = req.files as Express.Multer.File[];
+
+      for(const file of files) {
+        const url = await uploadToCloudinary(file.buffer);
+        image.push(url);
+      }
     }
 
     const product = await productService.createProduct({
@@ -62,10 +65,9 @@ export const createProduct = async (
     res.status(201).json(product);
   } catch (error) {
     console.error("Create product error:", error);
-    res.status(500).json({
-      message: "Failed to create product",
-    });
+    res.status(500).json({message: "Failed to create product",});
   }
+  console.log("FILES:", req.files);
 };
 
 /* =========================
@@ -76,30 +78,39 @@ export const updateProduct = async (
   res: Response
 ) => {
   try {
-    let image: string | undefined;
+    const product = await productService.getProductById(req.params.id);
 
-    if (req.file) {
-      console.log("uploading image to cloudinary");
-      image = await uploadToCloudinary(req.file.buffer);
-      console.log("CLOUDINARY URL", image);
+    let images = product.images || [];
+
+    if (req.files) {
+      const files = req.files as Express.Multer.File[];
+
+      //delete old images
+      for (const img of product.images) {
+        await deleteCloudinaryImage(img);
+      }
+
+      images =[];
+
+      for (const file of files) {
+        const url = await uploadToCloudinary(file.buffer);
+        images.push(url);
+      }
     }
 
-    console.log("Image url", image);
 
-    const product = await productService.updateProduct(
+    const updated = await productService.updateProduct(
       req.params.id,
       {
         ...req.body,
-        ...(image && { image }),
+        images
       }
     );
 
-    res.json(product);
+    res.json(updated);
   } catch (error: any) {
-    res.status(404).json({ message: error.message });
+    res.status(500).json({ message: "Failed to update product" });
   }
-  console.log("FILE:", req.file);
-  console.log("BODY", req.body);
 };
 
 /* =========================
@@ -110,14 +121,18 @@ export const deleteProduct = async (
   res: Response
 ) => {
   try {
+    const product = await productService.getProductById(req.params.id);
+
+    //delete images from cloudinary
+    for (const img of product.images) {
+      await deleteCloudinaryImage(img);
+    }
+
     await productService.deleteProduct(req.params.id);
 
     res.json({ message: "Deleted successfully" });
   } catch (error) {
-    console.error("Delete product error:", error);
-    res.status(500).json({
-      message: "Failed to delete product",
-    });
+    res.status(500).json({message: "Failed to delete product"});
   }
 };
 

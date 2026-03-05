@@ -25,9 +25,9 @@ const reviewSchema = new Schema(
     },
 
     description: {
-  type: String,
-  required: true,
-},
+      type: String,
+      required: true,
+    },
 
     comment: {
       type: String,
@@ -57,7 +57,11 @@ const productSchema = new Schema(
 
     description: String,
     category: String,
-    image: String,
+    
+    images: {
+      type: [String],
+      default: []
+    },
 
     countInStock: {
       type: Number,

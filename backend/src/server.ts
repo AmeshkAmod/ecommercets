@@ -1,8 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
 import { buildRolePermissionCache } from "./services/rbacService.js";
 import connectDB from "./config/db.js";
 import { seedRoles } from "./config/authRoles.js";
@@ -18,14 +16,6 @@ dotenv.config();
 
 const app = express();
 
-/* ---------- DB ---------- */
-
-/* ---------- SEED ROLES ---------- */
-(async () => {
-  await connectDB();
-  await seedRoles();
-  await buildRolePermissionCache();
-})();
 
 /* ---------- MIDDLEWARE ---------- */
 app.use(express.json());
@@ -50,6 +40,21 @@ app.use("/api/payment", paymentRoutes);
 
 /* ---------- SERVER ---------- */
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+
+/* ---------- SEED ROLES ---------- */
+async function startServer() {
+  try{
+    await connectDB();
+    await seedRoles();
+    await buildRolePermissionCache();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running at http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+}
+
+startServer();

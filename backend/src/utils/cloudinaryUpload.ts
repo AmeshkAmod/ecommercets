@@ -2,10 +2,10 @@ import cloudinary from "../config/cloudinary.js";
 
 export const uploadToCloudinary = (buffer: Buffer) => {
     return new Promise<string>((resolve, reject) => {
+
         const stream = cloudinary.uploader.upload_stream(
             { 
                 folder: "products",
-                
                 transformation: [
                     {
                         width: 800,
