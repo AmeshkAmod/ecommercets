@@ -42,7 +42,11 @@ export default function CartItem({ item }: CartItemProps) {
     <div className="grid grid-cols-[100px_1fr] gap-4 bg-[#020617] border border-gray-800 rounded-xl p-4">
       <div className="flex items-center justify-center border border-gray-800 rounded-lg p-2">
         <img
-          src={product.image}
+          src={
+            Array.isArray(product.images)
+            ? product.images[0]
+            : (product as any). images
+          }
           alt={product.title}
           className="max-h-20 object-contain"
         />
