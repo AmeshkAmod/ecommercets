@@ -17,8 +17,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { token } = useAppSelector((state: RootState) => state.auth);
   const isAuthenticated = !!token;
 
-  const cartStatus = useAppSelector((state: RootState) => state.cart.status);
-
+  const [isAdding, setIsAdding] = useState<boolean>(false);
   const [added, setAdded] = useState<boolean>(false);
 
   if (!product) return null;
@@ -26,9 +25,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const stock = product.countInStock ?? 0;
   const inStock = stock > 0;
 
-  const handleAddToCart = async (
+  const handleAddToCart = (
     e: MouseEvent<HTMLButtonElement>
-  ): Promise<void> => {
+  ): void => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -39,14 +38,16 @@ export default function ProductCard({ product }: ProductCardProps) {
 
     if (!inStock) return;
 
-    const res = await dispatch(addToCart(product._id));
+    setAdded(true);
+    setIsAdding(true);
+    window.setTimeout(() => setIsAdding(false), 250);
+    window.setTimeout(() => setAdded(false), 1200);
 
-    if (res.meta.requestStatus === "fulfilled") {
-      setAdded(true);
-      setTimeout(() => setAdded(false), 1200);
-    }
-
-    console.log(product.title, product);
+    void dispatch(addToCart(product._id)).then((res) => {
+      if (res.meta.requestStatus !== "fulfilled") {
+        setAdded(false);
+      }
+    });
   };
 
   return (
@@ -96,7 +97,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <motion.button
           onClick={handleAddToCart}
-          disabled={!inStock || cartStatus === "loading"}
+          disabled={!inStock || isAdding}
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.9 }}
           animate={
@@ -122,7 +123,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         >
           {added
             ? "✔ Added"
-            : cartStatus === "loading"
+            : isAdding
             ? "Adding..."
             : "Add to Cart"}
         </motion.button>

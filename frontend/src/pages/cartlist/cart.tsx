@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../../components/Navbar";
 import CartItem from "../../components/CartItem";
@@ -10,10 +10,17 @@ import type { RootState } from "../../store/store";
 export default function Cart() {
   const dispatch = useAppDispatch();
   const { items, status } = useSelector((state: RootState) => state.cart);
+  const [removingIds, setRemovingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     dispatch(fetchCart());
   }, [dispatch]);
+
+  const visibleItems = useMemo(
+    () =>
+      items.filter((item) => !removingIds.has(item.productId._id)),
+    [items, removingIds]
+  );
 
   const animateItemToBasket = useCallback((sourceElement: HTMLElement) => {
     const basket = document.getElementById("cart-waste-basket");
@@ -70,9 +77,28 @@ export default function Cart() {
   const handleRemoveWithAnimation = useCallback(
     (productId: string, sourceElement: HTMLElement) => {
       animateItemToBasket(sourceElement);
-      window.setTimeout(() => {
-        dispatch(removeFromCart(productId));
-      }, 120);
+      setRemovingIds((prev) => {
+        const next = new Set(prev);
+        next.add(productId);
+        return next;
+      });
+
+      void dispatch(removeFromCart(productId))
+        .unwrap()
+        .catch(() => {
+          setRemovingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(productId);
+            return next;
+          });
+        })
+        .finally(() => {
+          setRemovingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(productId);
+            return next;
+          });
+        });
     },
     [animateItemToBasket, dispatch]
   );
@@ -84,18 +110,18 @@ export default function Cart() {
       <main className="min-h-screen bg-[#020617] text-gray-200 p-6">
         <h1 className="text-xl font-bold mb-6">Your Cart</h1>
 
-        {status === "loading" && items.length === 0 && (
+        {status === "loading" && items.length === 0 && removingIds.size === 0 && (
           <p className="text-gray-400 text-sm">Loading cart...</p>
         )}
 
-        {status !== "loading" && items.length === 0 && (
+        {status !== "loading" && visibleItems.length === 0 && (
           <p className="text-gray-400 text-sm">Nothing here.</p>
         )}
 
-        {items.length > 0 && (
+        {visibleItems.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
             <section className="space-y-4">
-              {items.map((item) => (
+              {visibleItems.map((item) => (
                 <CartItem
                   key={item.productId._id}
                   item={item}
@@ -104,7 +130,7 @@ export default function Cart() {
               ))}
             </section>
 
-            <CartSummary items={items} />
+            <CartSummary items={visibleItems} />
           </div>
         )}
 
