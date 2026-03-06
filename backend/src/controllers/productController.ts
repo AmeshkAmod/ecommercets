@@ -46,20 +46,20 @@ export const createProduct = async (
   res: Response
 ) => {
   try {
-    let image: string[] = [];
+    let images: string[] = [];
 
     if (req.files) {
       const files = req.files as Express.Multer.File[];
 
       for(const file of files) {
         const url = await uploadToCloudinary(file.buffer);
-        image.push(url);
+        images.push(url);
       }
     }
 
     const product = await productService.createProduct({
       ...req.body,
-      image,
+      images,
     });
 
     res.status(201).json(product);

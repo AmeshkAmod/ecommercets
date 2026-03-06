@@ -49,7 +49,9 @@ export default function AdminProducts() {
   const handleImageChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const files = Array.from(e.target.files || []);
+    if(!e.target.files) return;
+
+    const files = Array.from(e.target.files);
 
       setImages(files);
 
@@ -62,7 +64,11 @@ export default function AdminProducts() {
 
   /* ---------- ADD PRODUCT ---------- */
   const handleAddProduct = () => {
-    if (!title || !description || !newPrice || !newStock) return;
+    if (!title || !description) return;
+
+    if (Number(newPrice) <= 0) return;
+
+    if (Number(newStock) <= 0) return;
 
     const formData = new FormData();
 
@@ -75,7 +81,7 @@ export default function AdminProducts() {
       formData.append("images", file);
     });
 
-    dispatch(addProduct(formData as any));
+    dispatch(addProduct(formData));
 
     setTitle("");
     setDescription("");
@@ -92,7 +98,7 @@ export default function AdminProducts() {
     setStock(String(product.countInStock));
     setEditDescription(product.description || "");
 
-    setEditPreview(product.images?.[0] || null);
+    setEditPreview(product.images?.length ? product.images[0] : null);
   };
 
   /* ---------- SAVE EDIT ---------- */
@@ -107,7 +113,7 @@ export default function AdminProducts() {
       formData.append("images", editImage);
     }
 
-    dispatch(updateProduct({ id, formData } as any));
+    dispatch(updateProduct({ id, formData }));
 
     setEditingId(null);
     setEditImage(null);
@@ -207,7 +213,7 @@ export default function AdminProducts() {
               className="border-t border-gray-800"
             >
               <td className="p-3 flex gap-2">
-                {p.images?.slice(0,3).map((img: string, i: number) => (
+                {p.images?.slice(0,3).map((img, i) => (
                   <img
                     key={i}
                     src={img}
