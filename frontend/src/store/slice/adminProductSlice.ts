@@ -17,7 +17,7 @@ const initialState: AdminProductState = {
 export const fetchProducts = createAsyncThunk<Product[]>(
   "adminProducts/fetch",
   async () => {
-    const res = await API.get("/products");
+    const res = await API.get<Product[]>("/products");
     return res.data;
   }
 );
@@ -28,14 +28,10 @@ export const updateProduct = createAsyncThunk<
 >(
   "adminProducts/update",
   async ({ id, formData }) => {
-    const res = await API.put(
+    const res = await API.put<Product>(
       `/products/${id}`,
       formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      
     );
 
     return res.data;
@@ -58,14 +54,10 @@ export const addProduct = createAsyncThunk<
 >(
   "adminProducts/add",
   async (formData) => {
-    const res = await API.post(
+    const res = await API.post<Product>(
       "/products",
       formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+
     );
 
     return res.data;
@@ -78,10 +70,20 @@ const slice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+    
     /* fetch */
+      .addCase(fetchProducts.pending, (s) => {
+        s.status = "loading";
+      })
       .addCase(fetchProducts.fulfilled, (s, a) => {
+        s.status = "succeeded";
         s.products = a.payload;
       })
+      .addCase(fetchProducts.rejected, (s, a) => {
+        s.status = "failed";
+        s.error = a.error.message || "Failed to fetch products";
+      })
+
       /* Delete */
       .addCase(deleteProduct.fulfilled, (s, a) => {
         s.products = s.products.filter(

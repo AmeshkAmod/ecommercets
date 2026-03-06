@@ -33,10 +33,10 @@ export default function AdminProducts() {
   const [editDescription, setEditDescription] =
     useState("");
 
-  const [editImage, setEditImage] =
-    useState<File | null>(null);
+  const [editImages, setEditImages] =
+    useState<File[]>([]);
   const [editPreview, setEditPreview] =
-    useState<string | null>(null);
+    useState<string[]>([]);
 
   /* ---------- FETCH PRODUCTS ---------- */
   useEffect(() => {
@@ -49,7 +49,9 @@ export default function AdminProducts() {
   const handleImageChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const files = Array.from(e.target.files || []);
+    if(!e.target.files) return;
+
+    const files = Array.from(e.target.files);
 
       setImages(files);
 
@@ -62,7 +64,11 @@ export default function AdminProducts() {
 
   /* ---------- ADD PRODUCT ---------- */
   const handleAddProduct = () => {
-    if (!title || !description || !newPrice || !newStock) return;
+    if (!title || !description) return;
+
+    if (Number(newPrice) <= 0) return;
+
+    if (Number(newStock) <= 0) return;
 
     const formData = new FormData();
 
@@ -75,7 +81,7 @@ export default function AdminProducts() {
       formData.append("images", file);
     });
 
-    dispatch(addProduct(formData as any));
+    dispatch(addProduct(formData));
 
     setTitle("");
     setDescription("");
@@ -92,7 +98,7 @@ export default function AdminProducts() {
     setStock(String(product.countInStock));
     setEditDescription(product.description || "");
 
-    setEditPreview(product.images?.[0] || null);
+    setEditPreview(product.images || []);
   };
 
   /* ---------- SAVE EDIT ---------- */
@@ -103,15 +109,15 @@ export default function AdminProducts() {
     formData.append("countInStock", stock);
     formData.append("description", editDescription);
 
-    if (editImage) {
-      formData.append("images", editImage);
-    }
+    editImages.forEach((file) => {
+      formData.append("images", file);
+    });
 
-    dispatch(updateProduct({ id, formData } as any));
+    dispatch(updateProduct({ id, formData }));
 
     setEditingId(null);
-    setEditImage(null);
-    setEditPreview(null);
+    setEditImages([]);
+    setEditPreview([]);
   };
 
   return (
@@ -207,7 +213,7 @@ export default function AdminProducts() {
               className="border-t border-gray-800"
             >
               <td className="p-3 flex gap-2">
-                {p.images?.slice(0,3).map((img: string, i: number) => (
+                {p.images?.slice(0,3).map((img, i) => (
                   <img
                     key={i}
                     src={img}
@@ -271,28 +277,35 @@ export default function AdminProducts() {
                       Change Image
                       <input
                         type="file"
+                        multiple
                         hidden
                         accept="image/*"
                         onChange={(e) => {
-                          const file =
-                            e.target.files?.[0];
-                          if (file) {
-                            setEditImage(file);
-                            setEditPreview(
-                              URL.createObjectURL(file)
-                            );
-                          }
+                          if (!e.target.files) return;
+
+                          const files = Array.from(e.target.files);
+
+                          setEditImages(files);
+
+                          const previews = files.map((file) => 
+                            URL.createObjectURL(file)
+                          );
+
+                          setEditPreview(previews);
                         }}
                       />
                     </label>
+                    
 
-                    {editPreview && (
-                      <img
-                        src={editPreview}
-                        alt="preview"
-                        className="w-20 rounded"
-                      />
-                    )}
+                    <div>
+                      {editPreview.map((img, i) => (
+                        <img
+                          key={i}
+                          src={img}
+                          className="w-20 rounded"
+                        />
+                      ))}
+                    </div>
 
                     <button
                       onClick={() =>
