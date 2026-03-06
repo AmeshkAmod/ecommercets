@@ -31,7 +31,6 @@ export default function MyOrders() {
 
   return (
     <div className="min-h-screen bg-[#020617] text-white p-8 relative">
-
       {/* Logo Top Left */}
       <div className="absolute top-6 left-8">
         <Link
@@ -57,9 +56,7 @@ export default function MyOrders() {
               >
                 <div className="flex justify-between text-sm text-gray-400">
                   <span>Order ID: {order._id}</span>
-                  <span>
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </span>
+                  <span>{new Date(order.createdAt).toLocaleDateString()}</span>
                 </div>
 
                 <div className="mt-3">
@@ -67,13 +64,28 @@ export default function MyOrders() {
                   <p className="text-gray-400">
                     Payment: {order.paymentMethod}
                   </p>
+
+                  {/* Products in this order */}
+                  <div className="mt-3 border-t border-gray-800 pt-3">
+                    <p className="text-gray-400 text-sm mb-1">Products:</p>
+
+                    {order.items
+                      ?.filter((item: any) => item.product)
+                      .map((item: any) => (
+                        <p
+                          key={item.product._id}
+                          className="text-sm text-gray-300"
+                        >
+                          • {item.product.title} × {item.qty}
+                        </p>
+                      ))}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
-
     </div>
   );
 }
