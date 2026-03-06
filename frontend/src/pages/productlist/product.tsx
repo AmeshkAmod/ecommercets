@@ -15,11 +15,9 @@ export default function Product() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
 
-  const { products } = useAppSelector((state) => state.product);
+  const { status, product } = useAppSelector((state) => state.product);
 
-  const product = products.find(
-    (p) => String(p._id) === id
-  );
+  const currentProduct = product;
 
   useEffect(() => {
     if (id) {
@@ -27,7 +25,7 @@ export default function Product() {
     }
   }, [dispatch, id]);
 
-  if (!product) {
+  if (status === "loading") {
     return (
       <>
         <Navbar />
@@ -37,7 +35,9 @@ export default function Product() {
       </>
     );
   }
-
+  if (!currentProduct) {
+    return <div>Product not found</div>;
+  }
   return (
     <>
       <Navbar />
@@ -48,7 +48,6 @@ export default function Product() {
         transition={{ duration: 0.6 }}
         className="relative p-6 bg-[#020617] min-h-screen text-gray-200 overflow-hidden"
       >
-
         {/* FLOATING PARTICLES */}
         {[...Array(25)].map((_, i) => (
           <motion.div
@@ -56,12 +55,12 @@ export default function Product() {
             animate={{ y: ["0%", "100%"], opacity: [0.2, 0.8, 0.2] }}
             transition={{
               duration: 10 + Math.random() * 10,
-              repeat: Infinity
+              repeat: Infinity,
             }}
             className="absolute w-1 h-1 bg-yellow-400 rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`
+              top: `${Math.random() * 100}%`,
             }}
           />
         ))}
@@ -102,10 +101,8 @@ export default function Product() {
           animate={{ y: 0, opacity: 1 }}
           className="text-xs text-gray-400 mb-4"
         >
-          <span className="text-yellow-400 cursor-pointer">
-            Home
-          </span>{" "}
-          › {product.category || "Product"}
+          <span className="text-yellow-400 cursor-pointer">Home</span> ›{" "}
+          {currentProduct.category || "Product"}
         </motion.div>
 
         {/* PRODUCT GRID */}
@@ -116,57 +113,53 @@ export default function Product() {
             hidden: {},
             show: {
               transition: {
-                staggerChildren: 0.2
-              }
-            }
+                staggerChildren: 0.2,
+              },
+            },
           }}
           className="grid grid-cols-1 lg:grid-cols-[2fr_3fr_2fr] gap-6"
         >
-
           <motion.div
             variants={{
               hidden: { opacity: 0, scale: 0.9 },
-              show: { opacity: 1, scale: 1 }
+              show: { opacity: 1, scale: 1 },
             }}
           >
-            <ProductImages product={product} />
+            <ProductImages product={currentProduct} />
           </motion.div>
 
           <motion.div
             variants={{
               hidden: { opacity: 0, x: 40 },
-              show: { opacity: 1, x: 0 }
+              show: { opacity: 1, x: 0 },
             }}
           >
-            <ProductInfo product={product} />
+            <ProductInfo product={currentProduct} />
           </motion.div>
 
           <motion.div
             variants={{
               hidden: { opacity: 0, x: 40 },
-              show: { opacity: 1, x: 0 }
+              show: { opacity: 1, x: 0 },
             }}
             whileHover={{ scale: 1.03 }}
           >
-            <BuyBox product={product} />
+            <BuyBox product={currentProduct} />
           </motion.div>
-
         </motion.section>
 
         {/* DESCRIPTION */}
-        {product.description && (
+        {currentProduct.description && (
           <motion.section
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="mt-8 bg-black border border-gray-800 p-6 rounded"
           >
-            <h2 className="text-lg font-semibold mb-3">
-              Product Description
-            </h2>
+            <h2 className="text-lg font-semibold mb-3">Product Description</h2>
 
             <p className="text-gray-400 leading-relaxed">
-              {product.description}
+              {currentProduct.description}
             </p>
           </motion.section>
         )}
@@ -177,9 +170,8 @@ export default function Product() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <ProductReviews product={product} />
+          <ProductReviews product={currentProduct} />
         </motion.div>
-
       </motion.main>
     </>
   );
