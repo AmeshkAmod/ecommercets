@@ -9,13 +9,13 @@ import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
-import userRoutes from "./routes/userRoutes.js"
-
+import userRoutes from "./routes/userRoutes.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
 
 dotenv.config();
 
 const app = express();
-
 
 /* ---------- MIDDLEWARE ---------- */
 app.use(express.json());
@@ -34,19 +34,21 @@ app.get("/", (req, res) => {
   res.json({ message: "Backend working" });
 });
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 /* ---------- ROUTES ---------- */
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/cart", cartRoutes);
-app.use("/api/users",userRoutes);
+app.use("/api/users", userRoutes);
 
 /* ---------- SERVER ---------- */
 const PORT = process.env.PORT || 5000;
 
 /* ---------- SEED ROLES ---------- */
 async function startServer() {
-  try{
+  try {
     await connectDB();
     await seedRoles();
     await buildRolePermissionCache();

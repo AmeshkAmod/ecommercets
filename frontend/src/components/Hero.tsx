@@ -21,7 +21,7 @@ export default function Hero() {
   return (
     <section
       className="relative mb-8 rounded-xl overflow-hidden border border-slate-800
-      bg-gradient-to-r from-[#020617] via-[#0f172a] to-[#020617]"
+      bg-linear-to-r from-[#020617] via-[#0f172a] to-[#020617]"
     >
       {/* Animated Glow */}
       <motion.div

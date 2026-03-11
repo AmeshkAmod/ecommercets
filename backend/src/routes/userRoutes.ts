@@ -3,8 +3,32 @@ import UserModel from "../models/User.js";
 import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User profile management
+ */
+
 
 /* GET current user */
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get current user
+ *     tags: [Users]
+ *     description: Retrieve the currently logged-in user's profile
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
 router.get("/me", protect, async (req: any, res) => {
   const user = await UserModel.findById(req.user._id)
     .select("-password")
@@ -17,6 +41,39 @@ router.get("/me", protect, async (req: any, res) => {
   res.json(user);});
 
 /* UPDATE current user */
+
+/**
+ * @swagger
+ * /users/me:
+ *   put:
+ *     summary: Update current user
+ *     tags: [Users]
+ *     description: Update profile information of the logged-in user
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
 router.put("/me", protect, async (req: any, res) => {
   const { name, email, phone, address } = req.body;
 
